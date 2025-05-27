@@ -1,0 +1,192 @@
+:root {
+    color-scheme: dark light;
+}
+
+body {
+    font-family: sans-serif;
+    text-align: center;
+    padding: 20px;
+    background-color: #121212;
+    color: #e0e0e0;
+    transition: background-color 0.3s, color 0.3s;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100vh;
+    box-sizing: border-box;
+    margin: 0;
+}
+
+body.light-mode {
+    background-color: #f0f0f0;
+    color: #000;
+}
+
+h1 {
+    margin-top: 40px; /* Space for toggle button */
+    margin-bottom: 15px;
+}
+
+#audio-status {
+    margin: 10px auto;
+    padding: 8px 12px;
+    font-weight: bold;
+    border-radius: 5px;
+    min-width: 250px; /* Ensure consistent width */
+}
+
+#audio-status.ready {
+    color: #33dd33;
+    background-color: rgba(51, 221, 51, 0.1);
+}
+
+#audio-status.error,
+#audio-status.suspended {
+    color: #ff5555;
+    background-color: rgba(255, 85, 85, 0.1);
+}
+body.light-mode #audio-status.ready {
+    color: #008800;
+    background-color: rgba(0, 136, 0, 0.1);
+}
+body.light-mode #audio-status.error,
+body.light-mode #audio-status.suspended {
+    color: #cc0000;
+    background-color: rgba(204, 0, 0, 0.1);
+}
+
+
+.controls-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 15px 25px; /* Row gap, column gap */
+    margin: 15px 0;
+    max-width: 600px;
+}
+
+.control-group {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+}
+
+.control-group label, .control-group span {
+    font-size: 0.9em;
+}
+
+select, input[type="range"] {
+    padding: 5px;
+    border-radius: 4px;
+    background-color: #333;
+    color: #e0e0e0;
+    border: 1px solid #555;
+    font-size: 0.9em;
+}
+body.light-mode select, body.light-mode input[type="range"] {
+    background-color: #fff;
+    color: #000;
+    border: 1px solid #ccc;
+}
+
+input[type="range"] {
+    width: 120px;
+}
+
+
+.instructions {
+    font-size: 0.8em;
+    color: #aaa;
+}
+
+body.light-mode .instructions {
+    color: #555;
+}
+
+#note-display {
+    font-size: 2em;
+    margin: 15px auto;
+    min-height: 1.5em; /* 2em * 1.5 -> 30px approx */
+    font-weight: bold;
+    color: #66aaff;
+}
+body.light-mode #note-display {
+    color: #0055cc;
+}
+
+
+#stylophone-container {
+    width: 80%;
+    max-width: 700px;
+    margin: 20px auto;
+    padding: 10px;
+    background: #333;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.5);
+}
+body.light-mode #stylophone-container {
+    background: #ccc;
+    box-shadow: 0 0 10px rgba(0,0,0,0.2);
+}
+
+#stylophone-surface {
+    width: 100%;
+    height: 150px;
+    background: linear-gradient(to bottom, #5a5a5a 0%, #404040 100%);
+    border: 2px solid #222;
+    border-radius: 5px;
+    cursor: crosshair;
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: none; /* Prevent scrolling/zooming on the surface */
+    position: relative; /* For note markers */
+    overflow: hidden; /* Clip markers that might slightly overflow */
+}
+body.light-mode #stylophone-surface {
+    background: linear-gradient(to bottom, #e0e0e0 0%, #c0c0c0 100%);
+    border: 2px solid #999;
+}
+
+.note-marker {
+    position: absolute;
+    bottom: 5px;
+    transform: translateX(-50%);
+    font-size: 0.8em;
+    color: #ccc;
+    pointer-events: none; /* So they don't interfere with surface interaction */
+}
+body.light-mode .note-marker {
+    color: #444;
+}
+.note-marker.natural { /* C, D, E, F, G, A, B */
+    font-weight: bold;
+    font-size: 0.9em;
+}
+.note-marker.root { /* C notes */
+    color: #fff; /* More prominent for C */
+}
+body.light-mode .note-marker.root {
+    color: #000;
+}
+
+
+#dark-mode-toggle {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    padding: 8px 12px;
+    font-size: 0.9em;
+    cursor: pointer;
+    background: #333;
+    color: #fff;
+    border: 1px solid #555;
+    border-radius: 5px;
+    transition: background 0.3s, color 0.3s, border 0.3s;
+}
+
+body.light-mode #dark-mode-toggle {
+    background: #ddd;
+    color: #000;
+    border: 1px solid #bbb;
+}

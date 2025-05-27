@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Super Deluxe Stylophone</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <button id="dark-mode-toggle">☀️ Light Mode</button>
+
+    <h1>🎹 Super Deluxe Stylophone</h1>
+
+    <div id="audio-status">Loading...</div>
+
+    <div class="controls-container">
+        <div class="control-group">
+            <label for="waveform-select">Waveform:</label>
+            <select id="waveform-select">
+                <option value="sine">Sine</option>
+                <option value="square" selected>Square</option>
+                <option value="sawtooth">Sawtooth</option>
+                <option value="triangle">Triangle</option>
+            </select>
+        </div>
+
+        <div class="control-group">
+            <label for="volume-slider">Volume:</label>
+            <input type="range" id="volume-slider" min="0" max="1" step="0.01" value="0.2">
+        </div>
+
+        <div class="control-group">
+            <span>Octave Shift: <span id="octave-shift-display">0</span></span>
+            <span class="instructions">(Use ↑/↓ Arrows)</span>
+        </div>
+         <div class="control-group">
+            <span class="instructions">Spacebar for Sustain</span>
+        </div>
+    </div>
+
+    <div id="note-display"> </div>
+
+    <div id="stylophone-container">
+        <div id="stylophone-surface">
+            <!-- Note markers will be added here by JavaScript -->
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
