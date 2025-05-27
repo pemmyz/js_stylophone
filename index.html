@@ -39,12 +39,23 @@
         </div>
     </div>
 
-    <div id="note-display"> </div>
+    <div id="note-and-freq-display"> <!-- Renamed and restructured -->
+        <span id="note-display"> </span>
+        <span id="freq-display"></span> <!-- New span for frequency -->
+    </div>
 
-    <div id="stylophone-container">
-        <div id="stylophone-surface">
-            <!-- Note markers will be added here by JavaScript -->
+
+    <div id="synth-pitch-control-container">
+        <div class="slider-group">
+            <label for="pitch-slider">Pitch Control:</label>
+            <div class="slider-wrapper">
+                <input type="range" id="pitch-slider" min="0" max="1000" step="1" value="250">
+                <div id="note-marker-bar"></div>
+            </div>
         </div>
+    </div>
+    <div class="instructions" style="margin-top: 10px;">
+        Click and drag slider to play. Release to stop (or hold Space to sustain).
     </div>
 
     <script src="script.js"></script>

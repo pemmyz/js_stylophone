@@ -62,7 +62,7 @@ body.light-mode #audio-status.suspended {
     justify-content: center;
     gap: 15px 25px; /* Row gap, column gap */
     margin: 15px 0;
-    max-width: 600px;
+    max-width: 700px;
 }
 
 .control-group {
@@ -76,24 +76,94 @@ body.light-mode #audio-status.suspended {
     font-size: 0.9em;
 }
 
-select, input[type="range"] {
+select { /* Specific styling for select if needed differently from range */
     padding: 5px;
     border-radius: 4px;
+    font-size: 0.9em;
     background-color: #333;
     color: #e0e0e0;
     border: 1px solid #555;
-    font-size: 0.9em;
 }
-body.light-mode select, body.light-mode input[type="range"] {
+body.light-mode select {
     background-color: #fff;
     color: #000;
     border: 1px solid #ccc;
 }
 
 input[type="range"] {
-    width: 120px;
+    padding: 0; /* Reset padding for range inputs */
+    cursor: grab;
+    -webkit-appearance: none;
+    appearance: none;
+    background: transparent; /* Make background transparent for custom styling */
+    width: 100%; /* Ensure it takes full width of its container */
+    /* Add some margin to the input itself if the thumb overflows the container vertically */
+    margin-top: 10px; /* To prevent thumb from clipping at top */
+    margin-bottom: 10px; /* To prevent thumb from clipping at bottom */
+
 }
 
+/* Custom Track Styles */
+input[type="range"]::-webkit-slider-runnable-track {
+    height: 40px; /* UPDATED: Taller track (20px * 2) */
+    background: #444; /* Darker for contrast with lighter thumb */
+    border-radius: 20px; /* Adjusted for thicker track */
+    border: 1px solid #222;
+}
+input[type="range"]::-moz-range-track {
+    height: 40px; /* UPDATED: Taller track (20px * 2) */
+    background: #444;
+    border-radius: 20px; /* Adjusted for thicker track */
+    border: 1px solid #222;
+}
+body.light-mode input[type="range"]::-webkit-slider-runnable-track {
+    height: 40px; /* UPDATED */
+    background: #bbb; /* Lighter for contrast with darker thumb */
+    border-radius: 20px;
+    border: 1px solid #999;
+}
+body.light-mode input[type="range"]::-moz-range-track {
+    height: 40px; /* UPDATED */
+    background: #bbb;
+    border-radius: 20px;
+    border: 1px solid #999;
+}
+
+/* Custom Thumb Styles */
+input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    /* margin-top: (trackHeight - thumbHeight) / 2 = (40px - 56px) / 2 = -8px */
+    margin-top: -8px; /* UPDATED */
+    width: 24px;  /* UPDATED: Wider thumb for taller design */
+    height: 56px; /* UPDATED: Taller thumb (28px * 2) */
+    background: #999;
+    border-radius: 8px; /* Adjusted for new size */
+    border: 2px solid #555;
+}
+input[type="range"]::-moz-range-thumb {
+    width: 22px; /* UPDATED: Wider thumb */
+    height: 52px; /* UPDATED: Taller thumb (26px * 2) */
+    background: #999;
+    border-radius: 8px;
+    border: 2px solid #555;
+    box-sizing: border-box;
+}
+body.light-mode input[type="range"]::-webkit-slider-thumb {
+    margin-top: -8px; /* UPDATED */
+    width: 24px; /* UPDATED */
+    height: 56px; /* UPDATED */
+    background: #777;
+    border-radius: 8px;
+    border: 2px solid #444;
+}
+body.light-mode input[type="range"]::-moz-range-thumb {
+    width: 22px; /* UPDATED */
+    height: 52px; /* UPDATED */
+    background: #777;
+    border-radius: 8px;
+    border: 2px solid #444;
+}
 
 .instructions {
     font-size: 0.8em;
@@ -104,10 +174,17 @@ body.light-mode .instructions {
     color: #555;
 }
 
+#note-and-freq-display {
+    display: flex;
+    justify-content: center;
+    align-items: baseline;
+    gap: 15px;
+    margin: 15px auto;
+    min-height: 1.5em;
+}
+
 #note-display {
     font-size: 2em;
-    margin: 15px auto;
-    min-height: 1.5em; /* 2em * 1.5 -> 30px approx */
     font-weight: bold;
     color: #66aaff;
 }
@@ -115,64 +192,112 @@ body.light-mode #note-display {
     color: #0055cc;
 }
 
+#freq-display {
+    font-size: 1em;
+    color: #aaa;
+    min-width: 80px;
+    text-align: left;
+}
+body.light-mode #freq-display {
+    color: #555;
+}
 
-#stylophone-container {
+
+#synth-pitch-control-container {
+    display: flex;
+    flex-direction: column;
     width: 80%;
-    max-width: 700px;
+    max-width: 600px;
     margin: 20px auto;
-    padding: 10px;
-    background: #333;
+    padding: 20px;
+    background: #282828;
     border-radius: 10px;
-    box-shadow: 0 0 10px rgba(0,0,0,0.5);
+    box-shadow: 0 0 10px rgba(0,0,0,0.4);
 }
-body.light-mode #stylophone-container {
-    background: #ccc;
-    box-shadow: 0 0 10px rgba(0,0,0,0.2);
+body.light-mode #synth-pitch-control-container {
+    background: #d8d8d8;
+    box-shadow: 0 0 10px rgba(0,0,0,0.15);
 }
 
-#stylophone-surface {
-    width: 100%;
-    height: 150px;
-    background: linear-gradient(to bottom, #5a5a5a 0%, #404040 100%);
-    border: 2px solid #222;
-    border-radius: 5px;
-    cursor: crosshair;
-    user-select: none;
-    -webkit-user-select: none;
-    touch-action: none; /* Prevent scrolling/zooming on the surface */
-    position: relative; /* For note markers */
-    overflow: hidden; /* Clip markers that might slightly overflow */
+.slider-group {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
-body.light-mode #stylophone-surface {
-    background: linear-gradient(to bottom, #e0e0e0 0%, #c0c0c0 100%);
-    border: 2px solid #999;
+.slider-group label {
+    margin-bottom: 10px;
+    font-size: 0.95em;
+}
+
+.slider-wrapper {
+    width: 100%;
+    position: relative;
+    /* Add padding to wrapper if thumb is very large and might visually clip parent */
+    /* padding-top: 5px; */
+    /* padding-bottom: 5px; */
+}
+
+#note-marker-bar {
+    width: 100%;
+    height: 20px;
+    position: relative;
+    /* The input[type="range"] above it now has margin-bottom: 10px.
+       This bar comes after it. It needs to be pushed down from the visual bottom
+       of the 40px track.
+       Given the 10px margin-bottom on the input itself, the markers might be too far.
+       Let's position it relative to the slider input's visual bottom.
+       A small positive margin-top should place it below the input's track.
+    */
+    margin-top: 8px; /* UPDATED: Increased space below the very tall track */
+    pointer-events: none;
 }
 
 .note-marker {
     position: absolute;
-    bottom: 5px;
+    bottom: 0;
     transform: translateX(-50%);
-    font-size: 0.8em;
-    color: #ccc;
-    pointer-events: none; /* So they don't interfere with surface interaction */
+    font-size: 0.75em;
+    color: #bbb;
+    white-space: nowrap;
 }
 body.light-mode .note-marker {
     color: #444;
 }
-.note-marker.natural { /* C, D, E, F, G, A, B */
-    font-weight: bold;
-    font-size: 0.9em;
+
+.note-marker::before {
+    content: '';
+    position: absolute;
+    width: 1px;
+    height: 6px;
+    background-color: #777;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
 }
-.note-marker.root { /* C notes */
-    color: #fff; /* More prominent for C */
+body.light-mode .note-marker::before {
+    background-color: #888;
+}
+
+.note-marker.natural::before {
+    height: 10px;
+}
+.note-marker.root {
+    font-weight: bold;
+    color: #fff;
+}
+.note-marker.root::before {
+    height: 12px;
+    background-color: #fff;
 }
 body.light-mode .note-marker.root {
     color: #000;
 }
-
+body.light-mode .note-marker.root::before {
+    background-color: #000;
+}
 
 #dark-mode-toggle {
-    position: absolute;
+    position: fixed;
     top: 10px;
     right: 10px;
     padding: 8px 12px;
@@ -183,6 +308,7 @@ body.light-mode .note-marker.root {
     border: 1px solid #555;
     border-radius: 5px;
     transition: background 0.3s, color 0.3s, border 0.3s;
+    z-index: 1000;
 }
 
 body.light-mode #dark-mode-toggle {
