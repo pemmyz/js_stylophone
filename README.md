@@ -16,7 +16,7 @@ Play and experiment with different waveforms, octave shifts, sustain mode, and l
 
 ## 🎧 Features
 
-- 🎛️ **Waveform Selection** – Sine, Square, Sawtooth, Triangle
+- 🎛️ **Waveform Selection** – Sine, Square, Sawtooth, Triangle, PWM, FM, AM, Ring Mod
 - 🔊 **Volume Control**
 - 🔼🔽 **Octave Shift** via Arrow Keys
 - ⌨️ **Sustain Pedal Mode** (Spacebar)
