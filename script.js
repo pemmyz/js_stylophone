@@ -39,7 +39,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const NOTE_NAMES = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
 
-    // Waveform specific constants from Super Deluxe Synth
     const FM_MODULATOR_RATIO = 1.4;
     const FM_MODULATION_INDEX_SCALE = 2.0;
     const AM_MODULATOR_FREQ = 7;
@@ -68,7 +67,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (localStorage.getItem('stylophoneDarkMode') === 'disabled') {
         setDarkMode(false);
     } else {
-        setDarkMode(true); // Default to dark
+        setDarkMode(true);
     }
 
     // --- Audio Initialization & Status ---
@@ -96,7 +95,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function initializeAudio() {
         return new Promise((resolve, reject) => {
             if (audioContext && audioContext.state === 'running') {
-                if (!mainOscillator) setupAudioNodes(); // Ensure nodes are set up if context was running but nodes weren't
+                if (!mainOscillator) setupAudioNodes();
                 resolve(); return;
             }
             try {
@@ -106,10 +105,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     });
                 }
                 audioContext.resume().then(() => {
-                    if (!pwmPeriodicWave && audioContext) { // Create PWM wave once context is ready
+                    if (!pwmPeriodicWave && audioContext) {
                          pwmPeriodicWave = audioContext.createPeriodicWave(PWM_REAL_COEFFS, PWM_IMAG_COEFFS, { disableNormalization: false });
                     }
-                    if (!mainOscillator) setupAudioNodes(); // Setup nodes after context is ready
+                    if (!mainOscillator) setupAudioNodes();
                     updateAudioStatus();
                     resolve();
                 }).catch(e => {
@@ -147,38 +146,30 @@ document.addEventListener('DOMContentLoaded', () => {
             try { modulatorScaleGainAM.disconnect(); } catch (e) {}
             modulatorScaleGainAM = null;
         }
-        // mainGainNode is typically reused or recreated, ensure it's disconnected from old sources
         if (mainGainNode) {
-            try { mainGainNode.disconnect(); } catch(e) {} // Disconnect from destination and any sources
+            try { mainGainNode.disconnect(); } catch(e) {}
         }
     }
 
-
     function setupAudioNodes() {
         if (!audioContext || audioContext.state !== 'running') return;
-
         const wasPlaying = soundPlaying;
-        if (wasPlaying) { // Temporarily mute if reconfiguring while playing
-            if (mainGainNode) mainGainNode.gain.setValueAtTime(0, audioContext.currentTime);
+        if (wasPlaying && mainGainNode) {
+            mainGainNode.gain.setValueAtTime(0, audioContext.currentTime);
         }
-
         cleanupPreviousNodes();
-
         mainOscillator = audioContext.createOscillator();
         mainGainNode = audioContext.createGain();
         mainGainNode.connect(audioContext.destination);
-        mainGainNode.gain.setValueAtTime(0, audioContext.currentTime); // Default to silent
+        mainGainNode.gain.setValueAtTime(0, audioContext.currentTime);
 
         switch (currentWaveform) {
-            case 'sine':
-            case 'square':
-            case 'sawtooth':
-            case 'triangle':
+            case 'sine': case 'square': case 'sawtooth': case 'triangle':
                 mainOscillator.type = currentWaveform;
                 mainOscillator.connect(mainGainNode);
                 break;
             case 'pwm':
-                if (!pwmPeriodicWave) { // Should have been created in initializeAudio
+                if (!pwmPeriodicWave) {
                     pwmPeriodicWave = audioContext.createPeriodicWave(PWM_REAL_COEFFS, PWM_IMAG_COEFFS, { disableNormalization: false });
                 }
                 mainOscillator.setPeriodicWave(pwmPeriodicWave);
@@ -189,8 +180,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 modulatorOsc1 = audioContext.createOscillator();
                 modulatorOsc1.type = 'sine';
                 modGain1 = audioContext.createGain();
-                // Freq and gain for modulator will be set in updatePitchDisplayAndOscillator
-
                 modulatorOsc1.connect(modGain1);
                 modGain1.connect(mainOscillator.frequency);
                 mainOscillator.connect(mainGainNode);
@@ -201,22 +190,17 @@ document.addEventListener('DOMContentLoaded', () => {
                 modulatorOsc1 = audioContext.createOscillator();
                 modulatorOsc1.type = 'sine';
                 modulatorOsc1.frequency.value = AM_MODULATOR_FREQ;
-
-                modGain1 = audioContext.createGain(); // This is the gain stage modulated by AM
-
+                modGain1 = audioContext.createGain();
                 dcOffsetNodeAM = audioContext.createConstantSource();
                 dcOffsetNodeAM.offset.value = 1.0 - (AM_MODULATION_DEPTH / 2);
                 dcOffsetNodeAM.start();
-
                 modulatorScaleGainAM = audioContext.createGain();
                 modulatorScaleGainAM.gain.value = AM_MODULATION_DEPTH / 2;
-
                 modulatorOsc1.connect(modulatorScaleGainAM);
                 dcOffsetNodeAM.connect(modGain1.gain);
                 modulatorScaleGainAM.connect(modGain1.gain);
-
-                mainOscillator.connect(modGain1); // Carrier goes into the gain being modulated
-                modGain1.connect(mainGainNode); // The result goes to the main output gain
+                mainOscillator.connect(modGain1);
+                modGain1.connect(mainGainNode);
                 modulatorOsc1.start();
                 break;
             case 'ring':
@@ -224,29 +208,24 @@ document.addEventListener('DOMContentLoaded', () => {
                 modulatorOsc1 = audioContext.createOscillator();
                 modulatorOsc1.type = 'sine';
                 modGain1 = audioContext.createGain();
-                // Modulator freq will be set in updatePitchDisplayAndOscillator
-                // For Ring Mod, modulator signal itself becomes the gain value (bipolar)
-
-                modulatorOsc1.connect(modGain1.gain); // Modulator signal controls the gain value
-                mainOscillator.connect(modGain1);    // Carrier passes through the modulated gain
-                modGain1.connect(mainGainNode);      // Result to main output gain
+                modulatorOsc1.connect(modGain1.gain);
+                mainOscillator.connect(modGain1);
+                modGain1.connect(mainGainNode);
                 modulatorOsc1.start();
                 break;
             default:
-                mainOscillator.type = 'square'; // Fallback
+                mainOscillator.type = 'square';
                 mainOscillator.connect(mainGainNode);
                 break;
         }
         mainOscillator.start();
-
-        if (wasPlaying) { // If it was playing, restore volume and current pitch
-            updatePitchDisplayAndOscillator(); // Apply current pitch to new setup
+        if (wasPlaying) {
+            updatePitchDisplayAndOscillator();
             mainGainNode.gain.setValueAtTime(globalVolume, audioContext.currentTime);
         } else {
-             updatePitchDisplayAndOscillator(); // Ensure display is correct even if not playing
+             updatePitchDisplayAndOscillator();
         }
     }
-
 
     // --- Pitch & Note Calculation ---
     function calculateFrequency() {
@@ -270,13 +249,13 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function updatePitchDisplayAndOscillator() {
-        const freq = calculateFrequency();
+        const freq = calculateFrequency(); // Uses current octaveShift
+
         if (audioContext && audioContext.state === 'running') {
             if (mainOscillator) {
                  mainOscillator.frequency.setTargetAtTime(freq, audioContext.currentTime, 0.002);
             }
-            // Update modulator parameters for relevant waveforms
-            if (modulatorOsc1 && modGain1) { // Check if they exist (for FM, AM, Ring)
+            if (modulatorOsc1 && modGain1) {
                 switch (currentWaveform) {
                     case 'fm':
                         modulatorOsc1.frequency.setTargetAtTime(freq * FM_MODULATOR_RATIO, audioContext.currentTime, 0.002);
@@ -284,34 +263,32 @@ document.addEventListener('DOMContentLoaded', () => {
                         break;
                     case 'ring':
                         modulatorOsc1.frequency.setTargetAtTime(freq * RING_MOD_RATIO, audioContext.currentTime, 0.002);
-                        // For Ring, modGain1.gain is driven by modulatorOsc1's output, not a static value.
                         break;
-                    // AM modulator frequency is fixed (AM_MODULATOR_FREQ) and gains are static based on depth.
                 }
             }
-             if (soundPlaying || isSliderInteractionActive) {
-                lastPlayedFrequency = freq;
-             }
         }
-        // Always update display
         noteDisplay.textContent = frequencyToNoteNameWithOctave(freq);
         freqDisplay.textContent = `${freq.toFixed(2)} Hz`;
 
+        // Always update lastPlayedFrequency to reflect the current potential pitch
+        // based on slider position and octave shift.
+        lastPlayedFrequency = freq;
+
+        // Adjust display logic for idle state AFTER lastPlayedFrequency is set
         if (!soundPlaying && !isSliderInteractionActive && !sustainPedalActive) {
              noteDisplay.textContent = " ";
+             // freqDisplay.textContent = ""; // Optional: clear freq display when fully idle
         }
     }
 
     // --- Sound Control ---
     function startSound() {
-        if (!isSliderInteractionActive) return; // Only start if slider is being actively interacted with
+        if (!isSliderInteractionActive) return;
         initializeAudio().then(() => {
-            if (!mainOscillator || !mainGainNode) { // If nodes aren't set up (e.g. first run)
+            if (!mainOscillator || !mainGainNode) {
                 setupAudioNodes();
             }
-            // setupAudioNodes would have set the correct waveform type/periodicWave
             updatePitchDisplayAndOscillator();
-
             const now = audioContext.currentTime;
             mainGainNode.gain.cancelScheduledValues(now);
             mainGainNode.gain.setValueAtTime(mainGainNode.gain.value, now);
@@ -323,9 +300,8 @@ document.addEventListener('DOMContentLoaded', () => {
     function stopSound() {
         if (sustainPedalActive) {
             if (mainGainNode && soundPlaying) {
-                 mainGainNode.gain.setTargetAtTime(globalVolume, audioContext.currentTime, 0.01); // Keep at current volume
+                 mainGainNode.gain.setTargetAtTime(globalVolume, audioContext.currentTime, 0.01);
             }
-            // Ensure display stays on last sustained note/freq
             if (lastPlayedFrequency > 0) {
                 noteDisplay.textContent = frequencyToNoteNameWithOctave(lastPlayedFrequency);
                 freqDisplay.textContent = `${lastPlayedFrequency.toFixed(2)} Hz`;
@@ -356,7 +332,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- Event Handlers for Pitch Slider ---
     function handleSliderInteractionStart(event) {
-        // For touch events, prevent default scrolling if the target is the slider
         if (event.type === 'touchstart' && event.target === pitchSlider) {
             event.preventDefault();
         }
@@ -372,21 +347,19 @@ document.addEventListener('DOMContentLoaded', () => {
     pitchSlider.addEventListener('input', () => {
         if (audioContext && audioContext.state === 'suspended') initializeAudio();
         updatePitchDisplayAndOscillator();
-        if (isSliderInteractionActive && !soundPlaying) { // If dragging but sound somehow stopped, restart
+        if (isSliderInteractionActive && !soundPlaying) {
             startSound();
         }
     });
     pitchSlider.addEventListener('mousedown', handleSliderInteractionStart);
-    pitchSlider.addEventListener('touchstart', handleSliderInteractionStart, { passive: false }); // passive: false to allow preventDefault
+    pitchSlider.addEventListener('touchstart', handleSliderInteractionStart, { passive: false });
 
-    // Use document to catch mouseup/touchend even if cursor moves off slider
     document.addEventListener('mouseup', (event) => {
         if (isSliderInteractionActive) handleSliderInteractionEnd();
     });
     document.addEventListener('touchend', (event) => {
         if (isSliderInteractionActive) handleSliderInteractionEnd();
     });
-
 
     // --- UI Control Handlers (Volume, Waveform, Octave, Sustain) ---
     volumeSlider.addEventListener('input', () => {
@@ -397,58 +370,70 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     volumeSlider.addEventListener('change', () => volumeSlider.blur());
 
-
     waveformSelect.addEventListener('change', () => {
         currentWaveform = waveformSelect.value;
         waveformSelect.blur();
         if (audioContext && audioContext.state === 'running') {
-            setupAudioNodes(); // Reconfigure the audio graph for the new waveform
-            // If sound was playing, setupAudioNodes would handle keeping it on
-            // If not playing, updatePitchDisplayAndOscillator (called in setupAudioNodes) updates display
+            setupAudioNodes();
         }
     });
 
     window.addEventListener('keydown', (event) => {
-        if (event.target === pitchSlider || event.target === volumeSlider || event.target === waveformSelect) return; // Ignore if focus is on controls
-        if (event.repeat) return;
-        if (audioContext && audioContext.state === 'suspended') initializeAudio();
+        if (event.repeat) return; // Prevent action spam on key hold for all keys.
 
+        // Handle global shortcuts (octave, sustain) first
+        // These should work even if a control like the pitch slider has focus.
         if (event.code === "ArrowUp" || event.code === "ArrowDown") {
-            event.preventDefault();
+            event.preventDefault(); // Prevent page scrolling
+            if (audioContext && audioContext.state === 'suspended') initializeAudio();
             if (event.code === "ArrowUp") octaveShift++;
             else octaveShift--;
             octaveShiftDisplay.textContent = octaveShift;
-            updatePitchDisplayAndOscillator();
+            updatePitchDisplayAndOscillator(); // This will apply the new octave immediately
+            return; // Handled
         } else if (event.code === "Space") {
-            event.preventDefault();
+            event.preventDefault(); // Prevent page scrolling or button activation
+            if (audioContext && audioContext.state === 'suspended') initializeAudio();
+
             if (!sustainPedalActive) {
                 sustainPedalActive = true;
                 if (isSliderInteractionActive && !soundPlaying) {
                     startSound();
                 } else if (!isSliderInteractionActive && !soundPlaying && lastPlayedFrequency > 0) {
-                    initializeAudio().then(() => { // Ensure audio is ready for sustain
+                    initializeAudio().then(() => {
                         if (!mainOscillator || !mainGainNode) setupAudioNodes();
-                        // Set oscillator to last played frequency before ramping up
+                        // Ensure oscillator is set to the correct lastPlayedFrequency (which updatePitchDisplayAndOscillator now keeps current)
                         mainOscillator.frequency.setValueAtTime(lastPlayedFrequency, audioContext.currentTime);
-                        updatePitchDisplayAndOscillator(); // This will also set modulator params if needed
+                        updatePitchDisplayAndOscillator(); // Refresh display and modulator params for this freq
 
                         const now = audioContext.currentTime;
                         mainGainNode.gain.cancelScheduledValues(now);
-                        mainGainNode.gain.setValueAtTime(0, now); // Start from silent for sustain ramp
+                        mainGainNode.gain.setValueAtTime(0, now);
                         mainGainNode.gain.linearRampToValueAtTime(globalVolume, now + attackTime);
                         soundPlaying = true;
                     });
-                } else if (soundPlaying) { // Already playing, ensure display and params are correct
+                } else if (soundPlaying) {
                     if (lastPlayedFrequency > 0) {
                         noteDisplay.textContent = frequencyToNoteNameWithOctave(lastPlayedFrequency);
                         freqDisplay.textContent = `${lastPlayedFrequency.toFixed(2)} Hz`;
                     }
                 }
             }
+            return; // Handled
         }
+
+        // If it's not one of the above global keys, then check for focused controls
+        // to prevent other keyboard interactions when user is focused on a slider/select.
+        if (event.target === pitchSlider || event.target === volumeSlider || event.target === waveformSelect) {
+            return;
+        }
+
+        // Any other unhandled key presses can go here if needed
     });
+
     window.addEventListener('keyup', (event) => {
-        if (event.target === pitchSlider || event.target === volumeSlider || event.target === waveformSelect) return;
+        // Only handle spacebar keyup for sustain logic.
+        // Arrow keys don't need keyup handling for octave shift.
         if (event.code === "Space") {
             event.preventDefault();
             sustainPedalActive = false;
@@ -499,31 +484,23 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (!(window.AudioContext || window.webkitAudioContext)) {
             updateAudioStatus("Browser doesn't support Web Audio API.", "error");
-            // Disable controls if Web Audio is not supported
             [pitchSlider, volumeSlider, waveformSelect, darkModeToggle].forEach(el => el.disabled = true);
             return;
         }
 
-        updateAudioStatus("Initializing..."); // Initial status
+        updateAudioStatus("Initializing...");
         initializeAudio().then(() => {
-            // setupAudioNodes is called within initializeAudio if successful
             drawNoteMarkers();
-            updatePitchDisplayAndOscillator(); // Update display based on initial slider
-        }).catch(err => {
-            // Error already handled by updateAudioStatus in initializeAudio
-        });
+            updatePitchDisplayAndOscillator();
+        }).catch(err => {});
 
-
-        // General click/touch listener to attempt audio unlock
         const initAudioOnFirstGesture = (event) => {
             if (audioContext && audioContext.state === 'suspended') {
                 initializeAudio().then(() => {
-                    // Remove listeners once successfully resumed
                     document.body.removeEventListener('click', initAudioOnFirstGesture, true);
                     document.body.removeEventListener('touchstart', initAudioOnFirstGesture, true);
                 });
             } else if (audioContext && audioContext.state === 'running') {
-                // Already running, remove listeners
                 document.body.removeEventListener('click', initAudioOnFirstGesture, true);
                 document.body.removeEventListener('touchstart', initAudioOnFirstGesture, true);
             }
