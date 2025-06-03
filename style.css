@@ -206,13 +206,14 @@ body.light-mode #freq-display {
 #synth-pitch-control-container {
     display: flex;
     flex-direction: column;
-    width: 80%;
-    max-width: 600px;
-    margin: 20px auto;
+    width: 100%; /* MODIFIED: Was 80%, changed to 100% to use full available width */
+    /* max-width: 600px; MODIFIED: Removed max-width to allow scaling to full width */
+    margin: 20px 0; /* MODIFIED: Was 20px auto, changed to 20px 0 as it's now full-width */
     padding: 20px;
     background: #282828;
     border-radius: 10px;
     box-shadow: 0 0 10px rgba(0,0,0,0.4);
+    box-sizing: border-box; /* ADDED: Ensures padding is included within the 100% width */
 }
 body.light-mode #synth-pitch-control-container {
     background: #d8d8d8;
