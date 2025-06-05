@@ -37,13 +37,6 @@ Play and experiment with different waveforms, octave shifts, sustain mode, and l
 
 ---
 
-## 📸 Preview
-
-<!-- Optional: Add actual interface preview -->
-<!-- ![Preview](preview.png) -->
-
----
-
 ## ⌨️ Keyboard Shortcuts
 
 | Key       | Function             |
