@@ -22,6 +22,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const freqDisplay = document.getElementById('freq-display');
     const statusDiv = document.getElementById('audio-status');
     const darkModeToggle = document.getElementById('dark-mode-toggle');
+    const snapToNoteCheckbox = document.getElementById('snap-to-note-checkbox');
     const body = document.body;
 
     let currentWaveform = waveformSelect.value;
@@ -346,6 +347,25 @@ document.addEventListener('DOMContentLoaded', () => {
 
     pitchSlider.addEventListener('input', () => {
         if (audioContext && audioContext.state === 'suspended') initializeAudio();
+
+        if (snapToNoteCheckbox.checked) {
+            const freq = calculateFrequency();
+            const noteNum = 12 * (Math.log2(freq / 440)) + 69;
+            const roundedNoteNum = Math.round(noteNum);
+            const snappedFreq = 440 * Math.pow(2, (roundedNoteNum - 69) / 12);
+
+            const currentMinFreq = PITCH_SLIDER_BASE_MIN_FREQ * Math.pow(2, octaveShift);
+            const currentMaxFreq = PITCH_SLIDER_BASE_MAX_FREQ * Math.pow(2, octaveShift);
+
+            if (snappedFreq >= currentMinFreq && snappedFreq <= currentMaxFreq) {
+                const normalizedPosition = Math.log(snappedFreq / currentMinFreq) / Math.log(currentMaxFreq / currentMinFreq);
+                const sliderMin = parseFloat(pitchSlider.min);
+                const sliderMax = parseFloat(pitchSlider.max);
+                const snappedSliderValue = sliderMin + normalizedPosition * (sliderMax - sliderMin);
+                pitchSlider.value = snappedSliderValue;
+            }
+        }
+
         updatePitchDisplayAndOscillator();
         if (isSliderInteractionActive && !soundPlaying) {
             startSound();
