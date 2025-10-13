@@ -211,25 +211,22 @@ body.light-mode .freq-display {
     gap: 25px;
 }
 
-/* --- UPDATED FOR FULL WIDTH --- */
 .synth-pitch-control-container {
     display: flex;
     flex-direction: row;
     align-items: flex-start;
     gap: 15px;
     width: 100%;
-    /* max-width and margin removed */
-    padding: 20px 30px; /* Added horizontal padding for content */
+    padding: 20px 30px;
     background: #282828;
-    border-radius: 0;   /* Removed border-radius */
-    box-shadow: none;   /* Removed box-shadow */
+    border-radius: 0;
+    box-shadow: none;
     box-sizing: border-box;
 }
 body.light-mode .synth-pitch-control-container {
     background: #d8d8d8;
-    box-shadow: none; /* Removed box-shadow */
+    box-shadow: none;
 }
-/* --- END OF UPDATE --- */
 
 .main-voice-panel {
     flex-grow: 1;
@@ -365,6 +362,7 @@ body.light-mode .voice-control-group label {
     margin: 0;
     width: 80px;
 }
+/* Webkit (Chrome, Safari) styles for volume slider */
 .voice-control-group input[type="range"].voice-volume::-webkit-slider-runnable-track {
     height: 5px;
     border-radius: 3px;
@@ -378,7 +376,38 @@ body.light-mode .voice-control-group input[type="range"].voice-volume::-webkit-s
     height: 16px;
     margin-top: -5.5px;
     border-radius: 3px;
+    background: #999;
+    border: 1px solid #555;
 }
+body.light-mode .voice-control-group input[type="range"].voice-volume::-webkit-slider-thumb {
+     background: #777;
+    border-color: #444;
+}
+
+/* --- FIX FOR FIREFOX VOLUME SLIDER --- */
+/* Firefox styles for volume slider */
+.voice-control-group input[type="range"].voice-volume::-moz-range-track {
+    height: 5px;
+    border-radius: 3px;
+    background: #555;
+}
+body.light-mode .voice-control-group input[type="range"].voice-volume::-moz-range-track {
+    background: #ccc;
+}
+.voice-control-group input[type="range"].voice-volume::-moz-range-thumb {
+    width: 12px;
+    height: 16px;
+    border-radius: 3px;
+    background: #999;
+    border: 1px solid #555;
+}
+body.light-mode .voice-control-group input[type="range"].voice-volume::-moz-range-thumb {
+    background: #777;
+    border-color: #444;
+}
+/* --- END OF FIREFOX FIX --- */
+
+
 .voice-control-group .octave-shifter {
     display: flex;
     align-items: center;
