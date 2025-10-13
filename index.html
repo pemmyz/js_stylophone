@@ -5,8 +5,7 @@
     <title>Super Deluxe Stylophone</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <link rel="stylesheet" href="style.css">
-</head>
-<body>
+</head><body>
 
     <button id="dark-mode-toggle">☀️ Light Mode</button>
 
@@ -49,26 +48,34 @@
          <div class="control-group">
             <span class="instructions">Spacebar for Sustain</span>
         </div>
-    </div>
 
-    <div id="note-and-freq-display">
-        <span id="note-display"> </span>
-        <span id="freq-display"></span>
-    </div>
-
-
-    <div id="synth-pitch-control-container">
-        <div class="slider-group">
-            <label for="pitch-slider">Pitch Control:</label>
-            <div class="slider-wrapper">
-                <input type="range" id="pitch-slider" min="0" max="1000" step="1" value="250">
-                <div id="note-marker-bar"></div>
-            </div>
+        <div class="control-group">
+            <button id="add-slider-btn">Add Voice</button>
         </div>
     </div>
-    <div class="instructions" style="margin-top: 10px;">
-        Click and drag slider to play. Release to stop (or hold Space to sustain).
-    </div>
+
+    <!-- This will hold all the individual slider units -->
+    <div id="multi-slider-container"></div>
+
+    <!-- Template for a single slider unit -->
+    <template id="slider-template">
+        <div class="synth-pitch-control-container">
+            <div class="note-and-freq-display">
+                <span class="note-display"> </span>
+                <span class="freq-display"></span>
+            </div>
+            <div class="slider-group">
+                <label>Pitch Control:</label>
+                <div class="slider-wrapper">
+                    <input type="range" class="pitch-slider" min="0" max="1000" step="1" value="250">
+                    <div class="note-marker-bar"></div>
+                </div>
+            </div>
+             <div class="instructions" style="margin-top: 10px;">
+                Click and drag slider to play. Release to stop (or hold Space to sustain).
+            </div>
+        </div>
+    </template>
 
     <script src="script.js"></script>
 </body>

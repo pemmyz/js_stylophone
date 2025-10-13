@@ -5,7 +5,7 @@
 body {
     font-family: sans-serif;
     text-align: center;
-    padding: 20px;
+    padding: 20px 0; /* MODIFIED: Removed horizontal padding */
     background-color: #121212;
     color: #e0e0e0;
     transition: background-color 0.3s, color 0.3s;
@@ -60,9 +60,10 @@ body.light-mode #audio-status.suspended {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
+    align-items: center; /* Vertically align items */
     gap: 15px 25px; /* Row gap, column gap */
     margin: 15px 0;
-    max-width: 700px;
+    max-width: 900px;
 }
 
 .control-group {
@@ -76,7 +77,7 @@ body.light-mode #audio-status.suspended {
     font-size: 0.9em;
 }
 
-select { /* Specific styling for select if needed differently from range */
+select, button { /* Specific styling for select if needed differently from range */
     padding: 5px;
     border-radius: 4px;
     font-size: 0.9em;
@@ -84,11 +85,16 @@ select { /* Specific styling for select if needed differently from range */
     color: #e0e0e0;
     border: 1px solid #555;
 }
-body.light-mode select {
+body.light-mode select, body.light-mode button {
     background-color: #fff;
     color: #000;
     border: 1px solid #ccc;
 }
+#add-slider-btn {
+    padding: 8px 12px;
+    cursor: pointer;
+}
+
 
 input[type="range"] {
     padding: 0; /* Reset padding for range inputs */
@@ -97,7 +103,6 @@ input[type="range"] {
     appearance: none;
     background: transparent; /* Make background transparent for custom styling */
     width: 100%; /* Ensure it takes full width of its container */
-    /* Add some margin to the input itself if the thumb overflows the container vertically */
     margin-top: 10px; /* To prevent thumb from clipping at top */
     margin-bottom: 10px; /* To prevent thumb from clipping at bottom */
 
@@ -133,7 +138,6 @@ body.light-mode input[type="range"]::-moz-range-track {
 input[type="range"]::-webkit-slider-thumb {
     -webkit-appearance: none;
     appearance: none;
-    /* margin-top: (trackHeight - thumbHeight) / 2 = (40px - 56px) / 2 = -8px */
     margin-top: -8px; /* UPDATED */
     width: 24px;  /* UPDATED: Wider thumb for taller design */
     height: 56px; /* UPDATED: Taller thumb (28px * 2) */
@@ -174,7 +178,7 @@ body.light-mode .instructions {
     color: #555;
 }
 
-#note-and-freq-display {
+.note-and-freq-display {
     display: flex;
     justify-content: center;
     align-items: baseline;
@@ -183,41 +187,49 @@ body.light-mode .instructions {
     min-height: 1.5em;
 }
 
-#note-display {
+.note-display {
     font-size: 2em;
     font-weight: bold;
     color: #66aaff;
 }
-body.light-mode #note-display {
+body.light-mode .note-display {
     color: #0055cc;
 }
 
-#freq-display {
+.freq-display {
     font-size: 1em;
     color: #aaa;
     min-width: 80px;
     text-align: left;
 }
-body.light-mode #freq-display {
+body.light-mode .freq-display {
     color: #555;
 }
 
-
-#synth-pitch-control-container {
+#multi-slider-container {
+    width: 100%;
     display: flex;
     flex-direction: column;
-    width: 100%; /* MODIFIED: Was 80%, changed to 100% to use full available width */
-    /* max-width: 600px; MODIFIED: Removed max-width to allow scaling to full width */
-    margin: 20px 0; /* MODIFIED: Was 20px auto, changed to 20px 0 as it's now full-width */
-    padding: 20px;
-    background: #282828;
-    border-radius: 10px;
-    box-shadow: 0 0 10px rgba(0,0,0,0.4);
-    box-sizing: border-box; /* ADDED: Ensures padding is included within the 100% width */
+    align-items: center;
+    gap: 25px;
 }
-body.light-mode #synth-pitch-control-container {
+
+
+.synth-pitch-control-container {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    /* max-width: 800px; <-- MODIFIED: Removed max-width */
+    margin: 0;
+    padding: 20px 30px; /* MODIFIED: Added some horizontal padding for aesthetics */
+    background: #282828;
+    border-radius: 0; /* MODIFIED: Removed radius for edge-to-edge feel */
+    box-shadow: none; /* MODIFIED: Removed shadow for clean edges */
+    box-sizing: border-box;
+}
+body.light-mode .synth-pitch-control-container {
     background: #d8d8d8;
-    box-shadow: 0 0 10px rgba(0,0,0,0.15);
+    box-shadow: none; /* MODIFIED: Removed shadow for clean edges */
 }
 
 .slider-group {
@@ -233,23 +245,13 @@ body.light-mode #synth-pitch-control-container {
 .slider-wrapper {
     width: 100%;
     position: relative;
-    /* Add padding to wrapper if thumb is very large and might visually clip parent */
-    /* padding-top: 5px; */
-    /* padding-bottom: 5px; */
 }
 
-#note-marker-bar {
+.note-marker-bar {
     width: 100%;
     height: 20px;
     position: relative;
-    /* The input[type="range"] above it now has margin-bottom: 10px.
-       This bar comes after it. It needs to be pushed down from the visual bottom
-       of the 40px track.
-       Given the 10px margin-bottom on the input itself, the markers might be too far.
-       Let's position it relative to the slider input's visual bottom.
-       A small positive margin-top should place it below the input's track.
-    */
-    margin-top: 8px; /* UPDATED: Increased space below the very tall track */
+    margin-top: 8px;
     pointer-events: none;
 }
 
