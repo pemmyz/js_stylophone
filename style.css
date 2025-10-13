@@ -5,7 +5,7 @@
 body {
     font-family: sans-serif;
     text-align: center;
-    padding: 20px 0; /* MODIFIED: Removed horizontal padding */
+    padding: 20px 0;
     background-color: #121212;
     color: #e0e0e0;
     transition: background-color 0.3s, color 0.3s;
@@ -103,67 +103,64 @@ input[type="range"] {
     appearance: none;
     background: transparent; /* Make background transparent for custom styling */
     width: 100%; /* Ensure it takes full width of its container */
-    margin-top: 10px; /* To prevent thumb from clipping at top */
-    margin-bottom: 10px; /* To prevent thumb from clipping at bottom */
-
 }
 
 /* Custom Track Styles */
-input[type="range"]::-webkit-slider-runnable-track {
-    height: 40px; /* UPDATED: Taller track (20px * 2) */
-    background: #444; /* Darker for contrast with lighter thumb */
-    border-radius: 20px; /* Adjusted for thicker track */
-    border: 1px solid #222;
-}
-input[type="range"]::-moz-range-track {
-    height: 40px; /* UPDATED: Taller track (20px * 2) */
+input[type="range"].pitch-slider::-webkit-slider-runnable-track {
+    height: 40px;
     background: #444;
-    border-radius: 20px; /* Adjusted for thicker track */
+    border-radius: 20px;
     border: 1px solid #222;
 }
-body.light-mode input[type="range"]::-webkit-slider-runnable-track {
-    height: 40px; /* UPDATED */
-    background: #bbb; /* Lighter for contrast with darker thumb */
+input[type="range"].pitch-slider::-moz-range-track {
+    height: 40px;
+    background: #444;
+    border-radius: 20px;
+    border: 1px solid #222;
+}
+body.light-mode input[type="range"].pitch-slider::-webkit-slider-runnable-track {
+    height: 40px;
+    background: #bbb;
     border-radius: 20px;
     border: 1px solid #999;
 }
-body.light-mode input[type="range"]::-moz-range-track {
-    height: 40px; /* UPDATED */
+body.light-mode input[type="range"].pitch-slider::-moz-range-track {
+    height: 40px;
     background: #bbb;
     border-radius: 20px;
     border: 1px solid #999;
 }
 
 /* Custom Thumb Styles */
-input[type="range"]::-webkit-slider-thumb {
+input[type="range"].pitch-slider::-webkit-slider-thumb {
     -webkit-appearance: none;
     appearance: none;
-    margin-top: -8px; /* UPDATED */
-    width: 24px;  /* UPDATED: Wider thumb for taller design */
-    height: 56px; /* UPDATED: Taller thumb (28px * 2) */
+    margin-top: -8px;
+    width: 24px;
+    height: 56px;
     background: #999;
-    border-radius: 8px; /* Adjusted for new size */
+    border-radius: 8px;
     border: 2px solid #555;
 }
-input[type="range"]::-moz-range-thumb {
-    width: 22px; /* UPDATED: Wider thumb */
-    height: 52px; /* UPDATED: Taller thumb (26px * 2) */
+input[type="range"].pitch-slider::-moz-range-thumb {
+    width: 22px;
+    height: 52px;
     background: #999;
     border-radius: 8px;
     border: 2px solid #555;
     box-sizing: border-box;
 }
-body.light-mode input[type="range"]::-webkit-slider-thumb {
-    margin-top: -8px; /* UPDATED */
-    width: 24px; /* UPDATED */
-    height: 56px; /* UPDATED */
+body.light-mode input[type="range"].pitch-slider::-webkit-slider-thumb {
+    margin-top: -8px;
+    width: 24px;
+    height: 56px;
     background: #777;
     border-radius: 8px;
     border: 2px solid #444;
 }
-body.light-mode input[type="range"]::-moz-range-thumb {
-    width: 22px; /* UPDATED */
-    height: 52px; /* UPDATED */
+body.light-mode input[type="range"].pitch-slider::-moz-range-thumb {
+    width: 22px;
+    height: 52px;
     background: #777;
     border-radius: 8px;
     border: 2px solid #444;
@@ -214,23 +211,33 @@ body.light-mode .freq-display {
     gap: 25px;
 }
 
-
+/* --- UPDATED FOR FULL WIDTH --- */
 .synth-pitch-control-container {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
+    align-items: flex-start;
+    gap: 15px;
     width: 100%;
-    /* max-width: 800px; <-- MODIFIED: Removed max-width */
-    margin: 0;
-    padding: 20px 30px; /* MODIFIED: Added some horizontal padding for aesthetics */
+    /* max-width and margin removed */
+    padding: 20px 30px; /* Added horizontal padding for content */
     background: #282828;
-    border-radius: 0; /* MODIFIED: Removed radius for edge-to-edge feel */
-    box-shadow: none; /* MODIFIED: Removed shadow for clean edges */
+    border-radius: 0;   /* Removed border-radius */
+    box-shadow: none;   /* Removed box-shadow */
     box-sizing: border-box;
 }
 body.light-mode .synth-pitch-control-container {
     background: #d8d8d8;
-    box-shadow: none; /* MODIFIED: Removed shadow for clean edges */
+    box-shadow: none; /* Removed box-shadow */
 }
+/* --- END OF UPDATE --- */
+
+.main-voice-panel {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+
 
 .slider-group {
     display: flex;
@@ -318,4 +325,81 @@ body.light-mode #dark-mode-toggle {
     background: #ddd;
     color: #000;
     border: 1px solid #bbb;
+}
+
+/* --- STYLES FOR VOICE CONTROLS --- */
+
+.voice-controls {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding-right: 15px;
+    border-right: 1px solid #444;
+    min-width: 90px;
+}
+body.light-mode .voice-controls {
+    border-right-color: #aaa;
+}
+.voice-control-group {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+}
+.voice-control-group label {
+    font-size: 0.8em;
+    font-weight: bold;
+    color: #ccc;
+}
+body.light-mode .voice-control-group label {
+    color: #333;
+}
+
+.voice-control-group select {
+    width: 100%;
+    font-size: 0.85em;
+    padding: 3px;
+}
+
+.voice-control-group input[type="range"].voice-volume {
+    margin: 0;
+    width: 80px;
+}
+.voice-control-group input[type="range"].voice-volume::-webkit-slider-runnable-track {
+    height: 5px;
+    border-radius: 3px;
+    background: #555;
+}
+body.light-mode .voice-control-group input[type="range"].voice-volume::-webkit-slider-runnable-track {
+    background: #ccc;
+}
+.voice-control-group input[type="range"].voice-volume::-webkit-slider-thumb {
+    width: 12px;
+    height: 16px;
+    margin-top: -5.5px;
+    border-radius: 3px;
+}
+.voice-control-group .octave-shifter {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.voice-control-group .octave-shifter button {
+    width: 25px;
+    height: 25px;
+    padding: 0;
+    font-weight: bold;
+    font-size: 1.1em;
+    line-height: 1;
+}
+.voice-control-group .octave-shifter span {
+    font-weight: bold;
+    min-width: 12px;
+    text-align: center;
+}
+.snap-control label {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    cursor: pointer;
 }

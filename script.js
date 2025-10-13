@@ -5,11 +5,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let lastInteractedVoice = null;
     let pwmPeriodicWave = null;
 
-    // --- Global Controls ---
-    const waveformSelect = document.getElementById('waveform-select');
-    const volumeSlider = document.getElementById('volume-slider');
-    const octaveShiftDisplay = document.getElementById('octave-shift-display');
-    const snapToNoteCheckbox = document.getElementById('snap-to-note-checkbox');
+    // --- Global Controls (only Add Voice now) ---
     const addSliderBtn = document.getElementById('add-slider-btn');
 
     // --- Other DOM Elements ---
@@ -20,8 +16,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const sliderTemplate = document.getElementById('slider-template');
 
     // --- Global State ---
-    let globalVolume = parseFloat(volumeSlider.value);
-    let octaveShift = 0;
     let sustainPedalActive = false;
 
     // --- Constants ---
@@ -131,7 +125,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         cleanupPreviousNodes(voice);
 
-        const currentWaveform = waveformSelect.value;
+        const currentWaveform = voice.waveform; // USE VOICE'S WAVEFORM
         const audio = voice.audio; // a shorter reference
         audio.mainOscillator = audioContext.createOscillator();
         audio.mainGainNode = audioContext.createGain();
@@ -197,7 +191,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (wasPlaying) {
             updatePitchDisplayAndOscillator(voice);
-            audio.mainGainNode.gain.setValueAtTime(globalVolume, audioContext.currentTime);
+            audio.mainGainNode.gain.setValueAtTime(voice.volume, audioContext.currentTime); // USE VOICE'S VOLUME
         } else {
              updatePitchDisplayAndOscillator(voice);
         }
@@ -209,8 +203,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const sliderMin = parseFloat(voice.elements.pitchSlider.min);
         const sliderMax = parseFloat(voice.elements.pitchSlider.max);
         const normalizedPosition = (sliderVal - sliderMin) / (sliderMax - sliderMin);
-        const currentMinFreq = PITCH_SLIDER_BASE_MIN_FREQ * Math.pow(2, octaveShift);
-        const currentMaxFreq = PITCH_SLIDER_BASE_MAX_FREQ * Math.pow(2, octaveShift);
+        const currentMinFreq = PITCH_SLIDER_BASE_MIN_FREQ * Math.pow(2, voice.octaveShift); // USE VOICE'S OCTAVE
+        const currentMaxFreq = PITCH_SLIDER_BASE_MAX_FREQ * Math.pow(2, voice.octaveShift); // USE VOICE'S OCTAVE
         let freq = currentMinFreq * Math.pow(currentMaxFreq / currentMinFreq, normalizedPosition);
         return freq;
     }
@@ -232,7 +226,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (audioContext && audioContext.state === 'running' && audio.mainOscillator) {
             audio.mainOscillator.frequency.setTargetAtTime(freq, audioContext.currentTime, 0.002);
             if (audio.modulatorOsc1 && audio.modGain1) {
-                switch (waveformSelect.value) {
+                switch (voice.waveform) { // USE VOICE'S WAVEFORM
                     case 'fm':
                         audio.modulatorOsc1.frequency.setTargetAtTime(freq * FM_MODULATOR_RATIO, audioContext.currentTime, 0.002);
                         audio.modGain1.gain.setTargetAtTime(freq * FM_MODULATION_INDEX_SCALE, audioContext.currentTime, 0.002);
@@ -263,7 +257,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const now = audioContext.currentTime;
             voice.audio.mainGainNode.gain.cancelScheduledValues(now);
             voice.audio.mainGainNode.gain.setValueAtTime(voice.audio.mainGainNode.gain.value, now);
-            voice.audio.mainGainNode.gain.linearRampToValueAtTime(globalVolume, now + attackTime);
+            voice.audio.mainGainNode.gain.linearRampToValueAtTime(voice.volume, now + attackTime); // USE VOICE'S VOLUME
             voice.state.soundPlaying = true;
         }).catch(err => console.error("Audio init failed on startSound:", err));
     }
@@ -320,12 +314,25 @@ document.addEventListener('DOMContentLoaded', () => {
         const pitchSlider = container.querySelector('.pitch-slider');
         
         const voice = {
+            // State for this specific voice
+            waveform: 'square',
+            volume: 0.2,
+            octaveShift: 0,
+            snapToNote: false,
+
             elements: {
                 container,
                 pitchSlider,
                 noteMarkerBar: container.querySelector('.note-marker-bar'),
                 noteDisplay: container.querySelector('.note-display'),
                 freqDisplay: container.querySelector('.freq-display'),
+                // New per-voice controls
+                waveformSelect: container.querySelector('.voice-waveform'),
+                volumeSlider: container.querySelector('.voice-volume'),
+                octaveUpBtn: container.querySelector('.octave-up'),
+                octaveDownBtn: container.querySelector('.octave-down'),
+                octaveDisplay: container.querySelector('.octave-display'),
+                snapCheckbox: container.querySelector('.voice-snap'),
             },
             audio: {},
             state: {
@@ -344,6 +351,40 @@ document.addEventListener('DOMContentLoaded', () => {
         initialNormPos = Math.max(0, Math.min(1, initialNormPos));
         pitchSlider.value = String(parseFloat(pitchSlider.min) + initialNormPos * (parseFloat(pitchSlider.max) - parseFloat(pitchSlider.min)));
 
+        // --- ATTACH EVENT LISTENERS TO PER-VOICE CONTROLS ---
+
+        voice.elements.waveformSelect.addEventListener('change', (e) => {
+            voice.waveform = e.target.value;
+            if (audioContext && audioContext.state === 'running') {
+                setupAudioNodes(voice);
+            }
+        });
+
+        voice.elements.volumeSlider.addEventListener('input', (e) => {
+            voice.volume = parseFloat(e.target.value);
+            if (voice.state.soundPlaying && voice.audio.mainGainNode) {
+                voice.audio.mainGainNode.gain.setTargetAtTime(voice.volume, audioContext.currentTime, 0.01);
+            }
+        });
+
+        voice.elements.octaveUpBtn.addEventListener('click', () => {
+            voice.octaveShift++;
+            voice.elements.octaveDisplay.textContent = voice.octaveShift;
+            updatePitchDisplayAndOscillator(voice);
+        });
+        voice.elements.octaveDownBtn.addEventListener('click', () => {
+            voice.octaveShift--;
+            voice.elements.octaveDisplay.textContent = voice.octaveShift;
+            updatePitchDisplayAndOscillator(voice);
+        });
+
+        voice.elements.snapCheckbox.addEventListener('change', (e) => {
+            voice.snapToNote = e.target.checked;
+        });
+
+
+        // --- SLIDER INTERACTION LOGIC ---
+
         function handleSliderInteractionStart(event) {
             if (event.type === 'touchstart') event.preventDefault();
             voice.state.isSliderInteractionActive = true;
@@ -360,13 +401,13 @@ document.addEventListener('DOMContentLoaded', () => {
             if (audioContext && audioContext.state === 'suspended') initializeAudio();
             lastInteractedVoice = voice;
 
-            if (snapToNoteCheckbox.checked) {
+            if (voice.snapToNote) {
                 const freq = calculateFrequency(voice);
                 const noteNum = 12 * (Math.log2(freq / 440)) + 69;
                 const roundedNoteNum = Math.round(noteNum);
                 const snappedFreq = 440 * Math.pow(2, (roundedNoteNum - 69) / 12);
-                const currentMinFreq = PITCH_SLIDER_BASE_MIN_FREQ * Math.pow(2, octaveShift);
-                const currentMaxFreq = PITCH_SLIDER_BASE_MAX_FREQ * Math.pow(2, octaveShift);
+                const currentMinFreq = PITCH_SLIDER_BASE_MIN_FREQ * Math.pow(2, voice.octaveShift);
+                const currentMaxFreq = PITCH_SLIDER_BASE_MAX_FREQ * Math.pow(2, voice.octaveShift);
                 if (snappedFreq >= currentMinFreq && snappedFreq <= currentMaxFreq) {
                     const normalizedPosition = Math.log(snappedFreq / currentMinFreq) / Math.log(currentMaxFreq / currentMinFreq);
                     const sliderMin = parseFloat(pitchSlider.min);
@@ -383,7 +424,6 @@ document.addEventListener('DOMContentLoaded', () => {
         pitchSlider.addEventListener('mousedown', handleSliderInteractionStart);
         pitchSlider.addEventListener('touchstart', handleSliderInteractionStart, { passive: false });
 
-        // Global listeners for mouse/touch release
         document.addEventListener('mouseup', () => { if(voice.state.isSliderInteractionActive) handleSliderInteractionEnd(); });
         document.addEventListener('touchend', () => { if(voice.state.isSliderInteractionActive) handleSliderInteractionEnd(); });
 
@@ -396,62 +436,31 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // --- Global Control Handlers ---
-    volumeSlider.addEventListener('input', () => {
-        globalVolume = parseFloat(volumeSlider.value);
-        voices.forEach(voice => {
-            if (voice.state.soundPlaying && voice.audio.mainGainNode) {
-                 voice.audio.mainGainNode.gain.setTargetAtTime(globalVolume, audioContext.currentTime, 0.01);
-            }
-        });
-    });
-    volumeSlider.addEventListener('change', () => volumeSlider.blur());
-
-    waveformSelect.addEventListener('change', () => {
-        waveformSelect.blur();
-        if (audioContext && audioContext.state === 'running') {
-            voices.forEach(voice => setupAudioNodes(voice));
-        }
-    });
-
     addSliderBtn.addEventListener('click', () => {
         createVoice();
         addSliderBtn.blur();
     });
 
     window.addEventListener('keydown', (event) => {
-        if (event.repeat) return;
-        const activeElement = document.activeElement;
-        const isSliderFocused = activeElement && activeElement.type === 'range';
-        
-        if (event.code === "ArrowUp" || event.code === "ArrowDown") {
-            if (isSliderFocused) return;
-            event.preventDefault();
-            if (audioContext && audioContext.state === 'suspended') initializeAudio();
-            octaveShift += (event.code === "ArrowUp" ? 1 : -1);
-            octaveShiftDisplay.textContent = octaveShift;
-            voices.forEach(voice => updatePitchDisplayAndOscillator(voice));
-            return;
-        } else if (event.code === "Space") {
-            event.preventDefault();
-            if (audioContext && audioContext.state === 'suspended') initializeAudio();
-            if (!sustainPedalActive) {
-                sustainPedalActive = true;
-                if (lastInteractedVoice && !lastInteractedVoice.state.soundPlaying) {
-                    // Re-trigger the last played note
-                    initializeAudio().then(() => {
-                        const voice = lastInteractedVoice;
-                        if (!voice.audio.mainOscillator) setupAudioNodes(voice);
-                        voice.audio.mainOscillator.frequency.setValueAtTime(voice.state.lastPlayedFrequency, audioContext.currentTime);
-                        updatePitchDisplayAndOscillator(voice); // Refresh display for this freq
-                        const now = audioContext.currentTime;
-                        voice.audio.mainGainNode.gain.cancelScheduledValues(now);
-                        voice.audio.mainGainNode.gain.setValueAtTime(0, now);
-                        voice.audio.mainGainNode.gain.linearRampToValueAtTime(globalVolume, now + attackTime);
-                        voice.state.soundPlaying = true;
-                    });
-                }
+        if (event.repeat || event.code !== "Space") return;
+        event.preventDefault();
+        if (audioContext && audioContext.state === 'suspended') initializeAudio();
+        if (!sustainPedalActive) {
+            sustainPedalActive = true;
+            if (lastInteractedVoice && !lastInteractedVoice.state.soundPlaying) {
+                // Re-trigger the last played note
+                initializeAudio().then(() => {
+                    const voice = lastInteractedVoice;
+                    if (!voice.audio.mainOscillator) setupAudioNodes(voice);
+                    voice.audio.mainOscillator.frequency.setValueAtTime(voice.state.lastPlayedFrequency, audioContext.currentTime);
+                    updatePitchDisplayAndOscillator(voice); // Refresh display for this freq
+                    const now = audioContext.currentTime;
+                    voice.audio.mainGainNode.gain.cancelScheduledValues(now);
+                    voice.audio.mainGainNode.gain.setValueAtTime(0, now);
+                    voice.audio.mainGainNode.gain.linearRampToValueAtTime(voice.volume, now + attackTime); // USE VOICE'S VOLUME
+                    voice.state.soundPlaying = true;
+                });
             }
-            return;
         }
     });
 
@@ -477,6 +486,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         updateAudioStatus("Initializing...");
         initializeAudio().then(() => {
+            // THIS LINE CREATES THE FIRST VOICE ON PAGE LOAD
             if (voices.length === 0) createVoice();
             voices.forEach(updatePitchDisplayAndOscillator);
         }).catch(err => {});

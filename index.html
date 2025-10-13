@@ -14,37 +14,6 @@
     <div id="audio-status">Loading...</div>
 
     <div class="controls-container">
-        <div class="control-group">
-            <label for="waveform-select">Waveform:</label>
-            <select id="waveform-select">
-                <option value="sine">Sine</option>
-                <option value="square" selected>Square</option>
-                <option value="sawtooth">Sawtooth</option>
-                <option value="triangle">Triangle</option>
-                <option value="pwm">PWM</option>
-                <option value="fm">FM</option>
-                <option value="am">AM</option>
-                <option value="ring">Ring Mod</option>
-            </select>
-        </div>
-
-        <div class="control-group">
-            <label for="volume-slider">Volume:</label>
-            <input type="range" id="volume-slider" min="0" max="1" step="0.01" value="0.2">
-        </div>
-
-        <div class="control-group">
-            <span>Octave Shift: <span id="octave-shift-display">0</span></span>
-            <span class="instructions">(Use ↑/↓ Arrows)</span>
-        </div>
-
-        <div class="control-group">
-            <label>
-                <input type="checkbox" id="snap-to-note-checkbox">
-                Snap to Notes
-            </label>
-        </div>
-
          <div class="control-group">
             <span class="instructions">Spacebar for Sustain</span>
         </div>
@@ -60,19 +29,57 @@
     <!-- Template for a single slider unit -->
     <template id="slider-template">
         <div class="synth-pitch-control-container">
-            <div class="note-and-freq-display">
-                <span class="note-display"> </span>
-                <span class="freq-display"></span>
-            </div>
-            <div class="slider-group">
-                <label>Pitch Control:</label>
-                <div class="slider-wrapper">
-                    <input type="range" class="pitch-slider" min="0" max="1000" step="1" value="250">
-                    <div class="note-marker-bar"></div>
+            <!-- INDIVIDUAL VOICE CONTROLS -->
+            <div class="voice-controls">
+                <div class="voice-control-group">
+                    <label>Wave</label>
+                    <select class="voice-waveform">
+                        <option value="sine">Sine</option>
+                        <option value="square" selected>Square</option>
+                        <option value="sawtooth">Saw</option>
+                        <option value="triangle">Tri</option>
+                        <option value="pwm">PWM</option>
+                        <option value="fm">FM</option>
+                        <option value="am">AM</option>
+                        <option value="ring">Ring</option>
+                    </select>
+                </div>
+                <div class="voice-control-group">
+                    <label>Volume</label>
+                    <input type="range" class="voice-volume" min="0" max="1" step="0.01" value="0.2">
+                </div>
+                <div class="voice-control-group">
+                     <label>Octave</label>
+                     <div class="octave-shifter">
+                        <button class="octave-down">-</button>
+                        <span class="octave-display">0</span>
+                        <button class="octave-up">+</button>
+                     </div>
+                </div>
+                 <div class="voice-control-group snap-control">
+                    <label>
+                        <input type="checkbox" class="voice-snap">
+                        Snap
+                    </label>
                 </div>
             </div>
-             <div class="instructions" style="margin-top: 10px;">
-                Click and drag slider to play. Release to stop (or hold Space to sustain).
+
+            <!-- MAIN PITCH SLIDER PANEL -->
+            <div class="main-voice-panel">
+                <div class="note-and-freq-display">
+                    <span class="note-display"> </span>
+                    <span class="freq-display"></span>
+                </div>
+                <div class="slider-group">
+                    <label>Pitch Control:</label>
+                    <div class="slider-wrapper">
+                        <input type="range" class="pitch-slider" min="0" max="1000" step="1" value="250">
+                        <div class="note-marker-bar"></div>
+                    </div>
+                </div>
+                 <div class="instructions" style="margin-top: 10px;">
+                    Click and drag slider to play. Release to stop (or hold Space to sustain).
+                </div>
             </div>
         </div>
     </template>
