@@ -484,7 +484,7 @@ document.addEventListener('DOMContentLoaded', () => {
             document.querySelectorAll('input, select, button').forEach(el => el.disabled = true);
             return;
         }
-        updateAudioStatus("Initializing...");
+        updateAudioStatus("Initializing... Press anywhere to start");
         initializeAudio().then(() => {
             // THIS LINE CREATES THE FIRST VOICE ON PAGE LOAD
             if (voices.length === 0) createVoice();
