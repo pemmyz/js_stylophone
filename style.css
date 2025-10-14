@@ -107,27 +107,27 @@ input[type="range"] {
 
 /* Custom Track Styles */
 input[type="range"].pitch-slider::-webkit-slider-runnable-track {
-    height: 40px;
+    height: 55px;
     background: #444;
-    border-radius: 20px;
+    border-radius: 27.5px;
     border: 1px solid #222;
 }
 input[type="range"].pitch-slider::-moz-range-track {
-    height: 40px;
+    height: 55px;
     background: #444;
-    border-radius: 20px;
+    border-radius: 27.5px;
     border: 1px solid #222;
 }
 body.light-mode input[type="range"].pitch-slider::-webkit-slider-runnable-track {
-    height: 40px;
+    height: 55px;
     background: #bbb;
-    border-radius: 20px;
+    border-radius: 27.5px;
     border: 1px solid #999;
 }
 body.light-mode input[type="range"].pitch-slider::-moz-range-track {
-    height: 40px;
+    height: 55px;
     background: #bbb;
-    border-radius: 20px;
+    border-radius: 27.5px;
     border: 1px solid #999;
 }
 
@@ -137,14 +137,14 @@ input[type="range"].pitch-slider::-webkit-slider-thumb {
     appearance: none;
     margin-top: -8px;
     width: 24px;
-    height: 56px;
+    height: 71px;
     background: #999;
     border-radius: 8px;
     border: 2px solid #555;
 }
 input[type="range"].pitch-slider::-moz-range-thumb {
     width: 22px;
-    height: 52px;
+    height: 67px;
     background: #999;
     border-radius: 8px;
     border: 2px solid #555;
@@ -153,14 +153,14 @@ input[type="range"].pitch-slider::-moz-range-thumb {
 body.light-mode input[type="range"].pitch-slider::-webkit-slider-thumb {
     margin-top: -8px;
     width: 24px;
-    height: 56px;
+    height: 71px;
     background: #777;
     border-radius: 8px;
     border: 2px solid #444;
 }
 body.light-mode input[type="range"].pitch-slider::-moz-range-thumb {
     width: 22px;
-    height: 52px;
+    height: 67px;
     background: #777;
     border-radius: 8px;
     border: 2px solid #444;
