@@ -19,6 +19,8 @@ document.addEventListener('DOMContentLoaded', () => {
     let sustainPedalActive = false;
 
     // --- Constants ---
+    // **MODIFICATION HERE: Added the new keys to the mapping array.**
+    const KEY_MAPPING = ['z', 'x', 'c', 'v', 'b', 'n', 'm', 'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l'];
     const attackTime = 0.015;
     const releaseTime = 0.15;
     const PITCH_SLIDER_BASE_MIN_FREQ = 110; // A2
@@ -241,14 +243,15 @@ document.addEventListener('DOMContentLoaded', () => {
         elements.freqDisplay.textContent = `${freq.toFixed(2)} Hz`;
         voice.state.lastPlayedFrequency = freq;
 
-        if (!voice.state.soundPlaying && !voice.state.isSliderInteractionActive && !sustainPedalActive) {
+        if (!voice.state.soundPlaying && !voice.state.isSliderInteractionActive && !voice.state.isKeyboardPlaying && !sustainPedalActive) {
              elements.noteDisplay.textContent = " ";
+             elements.freqDisplay.textContent = "";
         }
     }
 
     // --- Sound Control ---
     function startSound(voice) {
-        if (!voice.state.isSliderInteractionActive) return;
+        if (!voice.state.isSliderInteractionActive && !voice.state.isKeyboardPlaying) return;
         initializeAudio().then(() => {
             if (!voice.audio.mainOscillator || !voice.audio.mainGainNode) {
                 setupAudioNodes(voice);
@@ -312,7 +315,9 @@ document.addEventListener('DOMContentLoaded', () => {
         const voiceFragment = sliderTemplate.content.cloneNode(true);
         const container = voiceFragment.querySelector('.synth-pitch-control-container');
         const pitchSlider = container.querySelector('.pitch-slider');
-        
+        const voiceIndex = voices.length;
+        const assignedKey = KEY_MAPPING[voiceIndex];
+
         const voice = {
             // State for this specific voice
             waveform: 'square',
@@ -326,7 +331,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 noteMarkerBar: container.querySelector('.note-marker-bar'),
                 noteDisplay: container.querySelector('.note-display'),
                 freqDisplay: container.querySelector('.freq-display'),
-                // New per-voice controls
+                instructions: container.querySelector('.voice-instructions'),
                 waveformSelect: container.querySelector('.voice-waveform'),
                 volumeSlider: container.querySelector('.voice-volume'),
                 octaveUpBtn: container.querySelector('.octave-up'),
@@ -339,8 +344,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 isSliderInteractionActive: false,
                 soundPlaying: false,
                 lastPlayedFrequency: 0,
+                isKeyboardPlaying: false,
             }
         };
+        
+        if (assignedKey) {
+            voice.elements.instructions.textContent = `Click/drag slider or press '${assignedKey.toUpperCase()}' key to play. Release to stop (or hold Space).`;
+        } else {
+            voice.elements.instructions.textContent = 'Click and drag slider to play. Release to stop (or hold Space to sustain).';
+        }
 
         const initialTargetFreq = PITCH_SLIDER_BASE_MIN_FREQ * Math.pow(2, PITCH_SLIDER_OCTAVES / 3.5);
         let initialNormPos = 0;
@@ -442,38 +454,73 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     window.addEventListener('keydown', (event) => {
-        if (event.repeat || event.code !== "Space") return;
-        event.preventDefault();
-        if (audioContext && audioContext.state === 'suspended') initializeAudio();
-        if (!sustainPedalActive) {
-            sustainPedalActive = true;
-            if (lastInteractedVoice && !lastInteractedVoice.state.soundPlaying) {
-                // Re-trigger the last played note
-                initializeAudio().then(() => {
-                    const voice = lastInteractedVoice;
-                    if (!voice.audio.mainOscillator) setupAudioNodes(voice);
-                    voice.audio.mainOscillator.frequency.setValueAtTime(voice.state.lastPlayedFrequency, audioContext.currentTime);
-                    updatePitchDisplayAndOscillator(voice); // Refresh display for this freq
-                    const now = audioContext.currentTime;
-                    voice.audio.mainGainNode.gain.cancelScheduledValues(now);
-                    voice.audio.mainGainNode.gain.setValueAtTime(0, now);
-                    voice.audio.mainGainNode.gain.linearRampToValueAtTime(voice.volume, now + attackTime); // USE VOICE'S VOLUME
-                    voice.state.soundPlaying = true;
-                });
+        if (event.repeat) return;
+
+        // Handle Spacebar
+        if (event.code === "Space") {
+            event.preventDefault();
+            if (audioContext && audioContext.state === 'suspended') initializeAudio();
+            if (!sustainPedalActive) {
+                sustainPedalActive = true;
+                if (lastInteractedVoice && !lastInteractedVoice.state.soundPlaying) {
+                    // Re-trigger the last played note
+                    initializeAudio().then(() => {
+                        const voice = lastInteractedVoice;
+                        if (!voice.audio.mainOscillator) setupAudioNodes(voice);
+                        voice.audio.mainOscillator.frequency.setValueAtTime(voice.state.lastPlayedFrequency, audioContext.currentTime);
+                        updatePitchDisplayAndOscillator(voice); // Refresh display for this freq
+                        const now = audioContext.currentTime;
+                        voice.audio.mainGainNode.gain.cancelScheduledValues(now);
+                        voice.audio.mainGainNode.gain.setValueAtTime(voice.audio.mainGainNode.gain.value, now);
+                        voice.audio.mainGainNode.gain.linearRampToValueAtTime(voice.volume, now + attackTime); // USE VOICE'S VOLUME
+                        voice.state.soundPlaying = true;
+                    });
+                }
+            }
+            return;
+        }
+
+        // Handle Note Keys
+        const key = event.key.toLowerCase();
+        const keyIndex = KEY_MAPPING.indexOf(key);
+
+        if (keyIndex !== -1) {
+            event.preventDefault();
+            const voice = voices[keyIndex];
+            if (voice && !voice.state.soundPlaying) {
+                if (audioContext && audioContext.state === 'suspended') initializeAudio();
+                lastInteractedVoice = voice;
+                voice.state.isKeyboardPlaying = true;
+                startSound(voice);
             }
         }
     });
 
     window.addEventListener('keyup', (event) => {
+        // Handle Spacebar
         if (event.code === "Space") {
             event.preventDefault();
             sustainPedalActive = false;
-            // Stop any voices that were being sustained but are no longer being actively touched
+            // Stop any voices that were being sustained but are no longer being actively touched/keyed
             voices.forEach(voice => {
-                if (voice.state.soundPlaying && !voice.state.isSliderInteractionActive) {
+                if (voice.state.soundPlaying && !voice.state.isSliderInteractionActive && !voice.state.isKeyboardPlaying) {
                     stopSound(voice);
                 }
             });
+            return;
+        }
+
+        // Handle Note Keys
+        const key = event.key.toLowerCase();
+        const keyIndex = KEY_MAPPING.indexOf(key);
+
+        if (keyIndex !== -1) {
+             event.preventDefault();
+             const voice = voices[keyIndex];
+             if (voice && voice.state.isKeyboardPlaying) {
+                 voice.state.isKeyboardPlaying = false;
+                 stopSound(voice);
+             }
         }
     });
 
