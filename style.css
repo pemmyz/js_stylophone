@@ -242,7 +242,7 @@ body.light-mode .synth-pitch-control-container {
     align-items: center;
 }
 .slider-group label {
-    margin-bottom: 10px;
+    margin-bottom: 10px; /* REVERTED: This is the default value for other browsers */
     font-size: 0.95em;
 }
 
@@ -255,7 +255,7 @@ body.light-mode .synth-pitch-control-container {
     width: 100%;
     height: 20px;
     position: relative;
-    margin-top: 8px;
+    margin-top: 8px; /* REVERTED: This is the default value for other browsers */
     pointer-events: none;
 }
 
@@ -431,4 +431,16 @@ body.light-mode .voice-control-group input[type="range"].voice-volume::-moz-rang
     align-items: center;
     gap: 5px;
     cursor: pointer;
+}
+
+/* === NEW: FIREFOX-SPECIFIC FIX FOR SLIDER OVERLAP === */
+/* This block will only be applied by Firefox */
+@supports (-moz-appearance: none) {
+  .slider-group label {
+    margin-bottom: 20px; /* Give more space above the slider in FF */
+  }
+
+  .note-marker-bar {
+    margin-top: 20px; /* Give more space below the slider in FF */
+  }
 }
