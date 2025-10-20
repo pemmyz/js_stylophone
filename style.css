@@ -90,7 +90,7 @@ body.light-mode select, body.light-mode button {
     color: #000;
     border: 1px solid #ccc;
 }
-#add-slider-btn {
+#add-slider-btn, #help-btn {
     padding: 8px 12px;
     cursor: pointer;
 }
@@ -222,11 +222,24 @@ body.light-mode .freq-display {
     border-radius: 0;
     box-shadow: none;
     box-sizing: border-box;
+    outline: 2px solid transparent;
+    transition: outline-color 0.2s, box-shadow 0.2s;
 }
 body.light-mode .synth-pitch-control-container {
     background: #d8d8d8;
     box-shadow: none;
 }
+
+/* NEW: Highlight for the currently selected voice */
+.synth-pitch-control-container.selected-voice {
+    outline-color: #66aaff;
+    box-shadow: 0 0 10px rgba(102, 170, 255, 0.4);
+}
+body.light-mode .synth-pitch-control-container.selected-voice {
+    outline-color: #0055cc;
+    box-shadow: 0 0 10px rgba(0, 85, 204, 0.3);
+}
+
 
 .main-voice-panel {
     flex-grow: 1;
@@ -443,4 +456,83 @@ body.light-mode .voice-control-group input[type="range"].voice-volume::-moz-rang
   .note-marker-bar {
     margin-top: 20px; /* Give more space below the slider in FF */
   }
+}
+
+/* NEW: Help Modal Styles */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    display: none; /* Hidden by default */
+    justify-content: center;
+    align-items: center;
+    z-index: 2000;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+.modal-content {
+    background-color: #282828;
+    color: #e0e0e0;
+    padding: 25px 35px;
+    border-radius: 8px;
+    max-width: 600px;
+    max-height: 90vh;
+    overflow-y: auto;
+    position: relative;
+    text-align: left;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.4);
+}
+
+body.light-mode .modal-content {
+    background-color: #f0f0f0;
+    color: #000;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+}
+
+.modal-close-btn {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    background: none;
+    border: none;
+    font-size: 2.5em;
+    line-height: 1;
+    cursor: pointer;
+    color: #aaa;
+    padding: 0;
+}
+body.light-mode .modal-close-btn {
+    color: #555;
+}
+
+.modal-content h2 {
+    margin-top: 0;
+    color: #66aaff;
+}
+body.light-mode .modal-content h2 {
+    color: #0055cc;
+}
+.modal-content h3 {
+    margin-top: 20px;
+    border-bottom: 1px solid #555;
+    padding-bottom: 5px;
+}
+body.light-mode .modal-content h3 {
+    border-bottom-color: #ccc;
+}
+.modal-content ul {
+    padding-left: 20px;
+}
+.modal-content li {
+    margin-bottom: 10px;
+}
+.modal-content a {
+    color: #88ccff;
+}
+body.light-mode .modal-content a {
+    color: #0077dd;
 }

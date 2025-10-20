@@ -21,6 +21,10 @@
         <div class="control-group">
             <button id="add-slider-btn">Add Voice</button>
         </div>
+
+        <div class="control-group">
+            <button id="help-btn">Help (?)</button>
+        </div>
     </div>
 
     <!-- This will hold all the individual slider units -->
@@ -83,6 +87,39 @@
             </div>
         </div>
     </template>
+
+    <!-- Help Modal -->
+    <div id="help-modal" class="modal-overlay">
+        <div class="modal-content">
+            <button class="modal-close-btn">&times;</button>
+            <h2>Super Deluxe Stylophone - Help</h2>
+            <h3>What is a Stylophone?</h3>
+            <p>The Stylophone is a miniature analog stylus-operated keyboard invented in 1967. It's known for its simple, buzzy, electronic sound. This is a "super deluxe" web-based version with multiple voices and waveform options.</p>
+
+            <h3>Controls</h3>
+            <ul>
+                <li><strong>Pitch Slider:</strong> Click and drag the large slider to play notes. The pitch changes as you move the stylus (your mouse cursor).</li>
+                <li><strong>Sustain (Spacebar):</strong> Hold the spacebar to sustain the last note you played, even after releasing the mouse button or key.</li>
+                <li><strong>Keyboard Control:</strong> The first 16 voices can be played with keyboard keys:
+                    <ul>
+                        <li>Bottom Row: Z, X, C, V, B, N, M</li>
+                        <li>Home Row: A, S, D, F, G, H, J, K, L</li>
+                    </ul>
+                </li>
+                <li><strong>Octave Shift (Up/Down Arrows):</strong> Use the ▲ and ▼ arrow keys to shift the octave of the most recently used voice up or down. The selected voice is highlighted with a blue outline.</li>
+                <li><strong>Add Voice:</strong> Click the "Add Voice" button to create a new, independent synthesizer voice.</li>
+                <li><strong>Wave:</strong> Change the waveform (timbre) of the sound for each voice. Options include standard shapes (Square, Sine) and more complex ones like FM and PWM.</li>
+                <li><strong>Volume:</strong> Adjust the volume for each individual voice.</li>
+                <li><strong>Octave +/-:</strong> Click the '+' and '-' buttons to change the octave for that specific voice.</li>
+                <li><strong>Snap:</strong> When checked, the pitch slider will "snap" to the nearest musical note, making it easier to play in tune.</li>
+            </ul>
+
+            <h3>About</h3>
+            <p>This project was created with JavaScript using the Web Audio API.</p>
+            <p>Check out the code and contribute on the <a href="https://github.com/pemmyz/js_stylophone" target="_blank" rel="noopener noreferrer">GitHub Repository</a>.</p>
+        </div>
+    </div>
+
 
     <script src="script.js"></script>
 </body>

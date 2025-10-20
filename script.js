@@ -5,8 +5,9 @@ document.addEventListener('DOMContentLoaded', () => {
     let lastInteractedVoice = null;
     let pwmPeriodicWave = null;
 
-    // --- Global Controls (only Add Voice now) ---
+    // --- Global Controls ---
     const addSliderBtn = document.getElementById('add-slider-btn');
+    const helpBtn = document.getElementById('help-btn');
 
     // --- Other DOM Elements ---
     const statusDiv = document.getElementById('audio-status');
@@ -14,12 +15,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const body = document.body;
     const multiSliderContainer = document.getElementById('multi-slider-container');
     const sliderTemplate = document.getElementById('slider-template');
+    const helpModal = document.getElementById('help-modal');
+    const modalCloseBtn = helpModal.querySelector('.modal-close-btn');
 
     // --- Global State ---
     let sustainPedalActive = false;
 
     // --- Constants ---
-    // **MODIFICATION HERE: Added the new keys to the mapping array.**
     const KEY_MAPPING = ['z', 'x', 'c', 'v', 'b', 'n', 'm', 'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l'];
     const attackTime = 0.015;
     const releaseTime = 0.15;
@@ -56,6 +58,17 @@ document.addEventListener('DOMContentLoaded', () => {
         setDarkMode(false);
     } else {
         setDarkMode(true);
+    }
+
+    // --- Helper function for visual selection ---
+    function setSelectedVoice(voiceToSelect) {
+        // Remove the class from all voice containers first
+        voices.forEach(v => v.elements.container.classList.remove('selected-voice'));
+        // Add the class to the new selected voice's container
+        if (voiceToSelect) {
+            voiceToSelect.elements.container.classList.add('selected-voice');
+            lastInteractedVoice = voiceToSelect;
+        }
     }
 
     // --- Audio Initialization & Status ---
@@ -383,11 +396,13 @@ document.addEventListener('DOMContentLoaded', () => {
             voice.octaveShift++;
             voice.elements.octaveDisplay.textContent = voice.octaveShift;
             updatePitchDisplayAndOscillator(voice);
+            setSelectedVoice(voice); // Ensure this voice is selected
         });
         voice.elements.octaveDownBtn.addEventListener('click', () => {
             voice.octaveShift--;
             voice.elements.octaveDisplay.textContent = voice.octaveShift;
             updatePitchDisplayAndOscillator(voice);
+            setSelectedVoice(voice); // Ensure this voice is selected
         });
 
         voice.elements.snapCheckbox.addEventListener('change', (e) => {
@@ -400,7 +415,7 @@ document.addEventListener('DOMContentLoaded', () => {
         function handleSliderInteractionStart(event) {
             if (event.type === 'touchstart') event.preventDefault();
             voice.state.isSliderInteractionActive = true;
-            lastInteractedVoice = voice;
+            setSelectedVoice(voice);
             startSound(voice);
         }
 
@@ -411,7 +426,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         pitchSlider.addEventListener('input', () => {
             if (audioContext && audioContext.state === 'suspended') initializeAudio();
-            lastInteractedVoice = voice;
+            setSelectedVoice(voice);
 
             if (voice.snapToNote) {
                 const freq = calculateFrequency(voice);
@@ -442,6 +457,7 @@ document.addEventListener('DOMContentLoaded', () => {
         multiSliderContainer.appendChild(voiceFragment);
         voices.push(voice);
         drawNoteMarkers(voice);
+        setSelectedVoice(voice); // Select the newly created voice
         if (audioContext && audioContext.state === 'running') {
             setupAudioNodes(voice);
         }
@@ -480,6 +496,21 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
+        // Handle Arrow Keys for Octave Shift
+        if (event.key === "ArrowUp" || event.key === "ArrowDown") {
+            event.preventDefault();
+            if (lastInteractedVoice) {
+                if (event.key === "ArrowUp") {
+                    lastInteractedVoice.octaveShift++;
+                } else { // ArrowDown
+                    lastInteractedVoice.octaveShift--;
+                }
+                lastInteractedVoice.elements.octaveDisplay.textContent = lastInteractedVoice.octaveShift;
+                updatePitchDisplayAndOscillator(lastInteractedVoice);
+            }
+            return;
+        }
+
         // Handle Note Keys
         const key = event.key.toLowerCase();
         const keyIndex = KEY_MAPPING.indexOf(key);
@@ -489,7 +520,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const voice = voices[keyIndex];
             if (voice && !voice.state.soundPlaying) {
                 if (audioContext && audioContext.state === 'suspended') initializeAudio();
-                lastInteractedVoice = voice;
+                setSelectedVoice(voice);
                 voice.state.isKeyboardPlaying = true;
                 startSound(voice);
             }
@@ -523,6 +554,23 @@ document.addEventListener('DOMContentLoaded', () => {
              }
         }
     });
+    
+    // --- Help Modal Logic ---
+    helpBtn.addEventListener('click', () => {
+        helpModal.style.display = 'flex';
+    });
+
+    modalCloseBtn.addEventListener('click', () => {
+        helpModal.style.display = 'none';
+    });
+
+    helpModal.addEventListener('click', (event) => {
+        // If the click is on the overlay itself (not the content), close it.
+        if (event.target === helpModal) {
+            helpModal.style.display = 'none';
+        }
+    });
+
 
     // --- Initial Page Setup ---
     function initialSetup() {
