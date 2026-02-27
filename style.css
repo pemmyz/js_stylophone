@@ -568,6 +568,16 @@ body.mobile-view {
     overflow-x: hidden;
 }
 
+/* Layout Compacting: Audio Status & Controls closer together */
+body.mobile-view #audio-status {
+    margin-bottom: 2px;
+}
+body.mobile-view .controls-container {
+    margin-top: 5px; /* Reduced from 60px */
+    margin-bottom: 10px;
+    gap: 5px;
+}
+
 body.mobile-view .synth-pitch-control-container {
     flex-direction: column;
     padding: 10px;
@@ -600,14 +610,8 @@ body.light-mode.mobile-view .voice-controls {
     border-top: 1px solid #aaa;
 }
 
-body.mobile-view .controls-container {
-    margin-top: 60px;
-    margin-bottom: 10px;
-}
-
 /* --- SHRINK THE CONTAINER, INCREASE THE SLIDER --- */
 
-/* Reduce Note Display Size so container doesn't overflow */
 body.mobile-view .note-display {
     font-size: 1.5em;
     min-height: 1.2em;
@@ -621,9 +625,14 @@ body.mobile-view .slider-group label {
     margin-bottom: 5px;
 }
 
-/* === INCREASED SLIDER SIZE FOR MOBILE === */
+/* === INCREASED SLIDER SIZE & HITBOX FOR MOBILE === */
 
-/* Track Height: ~3x the previous mobile height (which was 30px, so now ~100px) */
+/* Ensure the input element ITSELF is tall enough to catch touches anywhere on the graphic */
+body.mobile-view input[type="range"].pitch-slider {
+    height: 120px; 
+}
+
+/* Track Height */
 body.mobile-view input[type="range"].pitch-slider::-webkit-slider-runnable-track {
     height: 100px;
     border-radius: 10px;
@@ -633,11 +642,11 @@ body.mobile-view input[type="range"].pitch-slider::-moz-range-track {
     border-radius: 10px;
 }
 
-/* Thumb Size: ~2x thicker width (from 18px to 40px) and taller than track */
+/* Thumb Size */
 body.mobile-view input[type="range"].pitch-slider::-webkit-slider-thumb {
     height: 120px;
     width: 40px;
-    margin-top: -10px; /* Centering: (100/2) - (120/2) = -10 */
+    margin-top: -10px; 
     border-radius: 8px;
 }
 body.mobile-view input[type="range"].pitch-slider::-moz-range-thumb {
