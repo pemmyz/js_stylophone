@@ -573,7 +573,7 @@ body.mobile-view #audio-status {
     margin-bottom: 2px;
 }
 body.mobile-view .controls-container {
-    margin-top: 5px; /* Reduced from 60px */
+    margin-top: 5px; 
     margin-bottom: 10px;
     gap: 5px;
 }
@@ -614,10 +614,11 @@ body.light-mode.mobile-view .voice-controls {
     border: none;
 }
 
+/* Default Mobile view (Landscape/Wide) */
 /* ABSOLUTE POSITIONING perfectly centers the note on the top line above the slider */
 body.mobile-view .note-and-freq-display {
     position: absolute;
-    top: 25px; /* Adjust slightly down to align with the labels of the left controls */
+    top: 25px; /* Align horizontally with the wave/volume controls */
     left: 50%;
     transform: translateX(-50%);
     margin: 0;
@@ -638,6 +639,34 @@ body.mobile-view .voice-instructions {
     width: 100%;
     margin-top: 15px;
 }
+
+/* --- PORTRAIT MODE OVERRIDE (Fix for narrow screens overlapping) --- */
+@media (orientation: portrait) {
+    /* Center the top controls, force to take 100% width so note drops down */
+    body.mobile-view .voice-controls {
+        width: 100%;
+        justify-content: center;
+        margin-bottom: 0;
+    }
+
+    /* Release absolute positioning so it flows naturally onto the 2nd line */
+    body.mobile-view .note-and-freq-display {
+        position: relative;
+        top: auto;
+        left: auto;
+        transform: none;
+        order: 2; /* Sits right after voice controls */
+        width: 100%;
+        margin: 10px auto 5px auto;
+        pointer-events: auto;
+    }
+
+    /* Remove the top margin since the note acts as a buffer now */
+    body.mobile-view .slider-group {
+        margin-top: 0;
+    }
+}
+
 
 /* --- SHRINK THE CONTAINER, INCREASE THE SLIDER --- */
 
