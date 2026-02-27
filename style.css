@@ -579,35 +579,64 @@ body.mobile-view .controls-container {
 }
 
 body.mobile-view .synth-pitch-control-container {
-    flex-direction: column;
+    position: relative; /* REQUIRED so the absolute Note aligns properly inside */
+    flex-direction: row; 
+    flex-wrap: wrap;
     padding: 10px;
     min-height: auto;
     height: auto;
-    justify-content: center;
+    align-items: flex-start; 
+    justify-content: flex-start;
 }
 
+/* Flatten the main panel so we can interleave its children with the controls */
 body.mobile-view .main-voice-panel {
-    order: 1;
-    width: 100%;
-    margin-bottom: 10px;
-    flex-grow: 0;
+    display: contents; 
 }
 
+/* Positioned left on the top row */
 body.mobile-view .voice-controls {
-    order: 2;
+    order: 1; 
     flex-direction: row;
     flex-wrap: wrap;
-    justify-content: center;
+    justify-content: flex-start; 
     align-items: center;
-    width: 100%;
-    padding-right: 0;
-    padding-top: 10px;
-    border-right: none;
-    border-top: 1px solid #444;
+    width: auto; 
+    padding: 0;
+    margin-bottom: 10px;
+    border: none; 
+    gap: 15px; 
+    position: relative;
+    z-index: 2; /* Ensures it stays clickable */
 }
 
 body.light-mode.mobile-view .voice-controls {
-    border-top: 1px solid #aaa;
+    border: none;
+}
+
+/* ABSOLUTE POSITIONING perfectly centers the note on the top line above the slider */
+body.mobile-view .note-and-freq-display {
+    position: absolute;
+    top: 25px; /* Adjust slightly down to align with the labels of the left controls */
+    left: 50%;
+    transform: translateX(-50%);
+    margin: 0;
+    width: auto;
+    z-index: 1;
+    pointer-events: none; /* Prevents blocking clicks if it overlaps controls on tiny screens */
+}
+
+/* Slider Group drops to the next line automatically because it's 100% width */
+body.mobile-view .slider-group {
+    order: 3;
+    width: 100%;
+    margin-top: 5px; /* Spacing below the controls row */
+}
+
+body.mobile-view .voice-instructions {
+    order: 4;
+    width: 100%;
+    margin-top: 15px;
 }
 
 /* --- SHRINK THE CONTAINER, INCREASE THE SLIDER --- */
@@ -615,10 +644,6 @@ body.light-mode.mobile-view .voice-controls {
 body.mobile-view .note-display {
     font-size: 1.5em;
     min-height: 1.2em;
-}
-
-body.mobile-view .note-and-freq-display {
-    margin: 5px auto;
 }
 
 body.mobile-view .slider-group label {
