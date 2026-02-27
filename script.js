@@ -1,5 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
     // --- Global Variables & DOM Elements ---
+    // simple test when things are bugging around
     let audioContext;
     let voices = []; // Array to hold all voice objects
     let lastInteractedVoice = null;
