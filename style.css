@@ -316,6 +316,8 @@ body.light-mode .note-marker.root::before {
     background-color: #000;
 }
 
+/* --- BUTTON STYLES --- */
+
 #dark-mode-toggle {
     position: fixed;
     top: 10px;
@@ -331,7 +333,23 @@ body.light-mode .note-marker.root::before {
     z-index: 1000;
 }
 
-body.light-mode #dark-mode-toggle {
+#mobile-mode-btn {
+    position: fixed;
+    top: 10px;
+    left: 10px;
+    padding: 8px 12px;
+    font-size: 0.9em;
+    cursor: pointer;
+    background: #333;
+    color: #fff;
+    border: 1px solid #555;
+    border-radius: 5px;
+    transition: background 0.3s, color 0.3s, border 0.3s;
+    z-index: 1000;
+}
+
+body.light-mode #dark-mode-toggle, 
+body.light-mode #mobile-mode-btn {
     background: #ddd;
     color: #000;
     border: 1px solid #bbb;
@@ -535,4 +553,92 @@ body.light-mode .modal-content h3 {
 }
 body.light-mode .modal-content a {
     color: #0077dd;
+}
+
+/* =========================================
+   MOBILE MODE STYLES
+   ========================================= */
+
+body.mobile-view {
+    padding: 0;
+    justify-content: flex-start;
+    overflow-x: hidden;
+}
+
+body.mobile-view .synth-pitch-control-container {
+    flex-direction: column;
+    padding: 10px;
+    min-height: auto;
+    height: auto;
+    justify-content: center;
+}
+
+body.mobile-view .main-voice-panel {
+    order: 1;
+    width: 100%;
+    margin-bottom: 10px;
+    flex-grow: 0;
+}
+
+body.mobile-view .voice-controls {
+    order: 2;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    padding-right: 0;
+    padding-top: 10px;
+    border-right: none;
+    border-top: 1px solid #444;
+}
+
+body.light-mode.mobile-view .voice-controls {
+    border-top: 1px solid #aaa;
+}
+
+body.mobile-view .controls-container {
+    margin-top: 60px;
+    margin-bottom: 10px;
+}
+
+/* --- SHRINK THE CONTAINER, INCREASE THE SLIDER --- */
+
+/* Reduce Note Display Size so container doesn't overflow */
+body.mobile-view .note-display {
+    font-size: 1.5em;
+    min-height: 1.2em;
+}
+
+body.mobile-view .note-and-freq-display {
+    margin: 5px auto;
+}
+
+body.mobile-view .slider-group label {
+    margin-bottom: 5px;
+}
+
+/* === INCREASED SLIDER SIZE FOR MOBILE === */
+
+/* Track Height: ~3x the previous mobile height (which was 30px, so now ~100px) */
+body.mobile-view input[type="range"].pitch-slider::-webkit-slider-runnable-track {
+    height: 100px;
+    border-radius: 10px;
+}
+body.mobile-view input[type="range"].pitch-slider::-moz-range-track {
+    height: 100px;
+    border-radius: 10px;
+}
+
+/* Thumb Size: ~2x thicker width (from 18px to 40px) and taller than track */
+body.mobile-view input[type="range"].pitch-slider::-webkit-slider-thumb {
+    height: 120px;
+    width: 40px;
+    margin-top: -10px; /* Centering: (100/2) - (120/2) = -10 */
+    border-radius: 8px;
+}
+body.mobile-view input[type="range"].pitch-slider::-moz-range-thumb {
+    height: 120px;
+    width: 40px;
+    border-radius: 8px;
 }

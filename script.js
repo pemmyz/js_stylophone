@@ -8,6 +8,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- Global Controls ---
     const addSliderBtn = document.getElementById('add-slider-btn');
     const helpBtn = document.getElementById('help-btn');
+    const mobileModeBtn = document.getElementById('mobile-mode-btn');
 
     // --- Other DOM Elements ---
     const statusDiv = document.getElementById('audio-status');
@@ -59,6 +60,39 @@ document.addEventListener('DOMContentLoaded', () => {
     } else {
         setDarkMode(true);
     }
+
+    // --- Mobile Mode ---
+    function goFull() {
+        const el = document.documentElement;
+        if (!document.fullscreenElement && !document.webkitFullscreenElement) {
+             if (el.requestFullscreen) {
+                el.requestFullscreen().catch(err => console.log(err));
+            } else if (el.webkitRequestFullscreen) { // older Android fallback
+                el.webkitRequestFullscreen();
+            }
+            body.classList.add('mobile-view');
+        } else {
+             if (document.exitFullscreen) {
+                document.exitFullscreen();
+            } else if (document.webkitExitFullscreen) {
+                document.webkitExitFullscreen();
+            }
+            body.classList.remove('mobile-view');
+        }
+    }
+
+    mobileModeBtn.addEventListener('click', () => {
+        goFull();
+        mobileModeBtn.blur();
+    });
+
+    // Listen for fullscreen changes (e.g. user pressing ESC) to sync class
+    document.addEventListener('fullscreenchange', () => {
+        if (!document.fullscreenElement) {
+            body.classList.remove('mobile-view');
+        }
+    });
+
 
     // --- Helper function for visual selection ---
     function setSelectedVoice(voiceToSelect) {
