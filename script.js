@@ -447,7 +447,10 @@ document.addEventListener('DOMContentLoaded', () => {
         // --- SLIDER INTERACTION LOGIC ---
 
         function handleSliderInteractionStart(event) {
-            if (event.type === 'touchstart') event.preventDefault();
+            // Note: We do NOT call preventDefault here for touchstart anymore.
+            // This allows the element to receive focus and potential click events if needed,
+            // but we handle value updates manually in touch handlers.
+            
             voice.state.isSliderInteractionActive = true;
             setSelectedVoice(voice);
             startSound(voice);
@@ -458,7 +461,8 @@ document.addEventListener('DOMContentLoaded', () => {
             stopSound(voice);
         }
 
-        pitchSlider.addEventListener('input', () => {
+        // Shared Logic for updating pitch from Input or Touch
+        function handlePitchInputChange() {
             if (audioContext && audioContext.state === 'suspended') initializeAudio();
             setSelectedVoice(voice);
 
@@ -480,10 +484,51 @@ document.addEventListener('DOMContentLoaded', () => {
             if (voice.state.isSliderInteractionActive && !voice.state.soundPlaying) {
                 startSound(voice);
             }
-        });
+        }
+
+        // Standard Mouse/Input Event
+        pitchSlider.addEventListener('input', handlePitchInputChange);
+
+        // Touch Coordinate Mapping (The "Ribbon Controller" logic)
+        function handleTouchUpdate(e) {
+            // Prevent scrolling while interacting with the slider
+            if(e.cancelable) e.preventDefault();
+
+            const touch = e.touches[0];
+            const rect = pitchSlider.getBoundingClientRect();
+            
+            // Calculate relative X position (0 to rect.width)
+            let x = touch.clientX - rect.left;
+            x = Math.max(0, Math.min(rect.width, x)); // Clamp
+            
+            const min = parseFloat(pitchSlider.min);
+            const max = parseFloat(pitchSlider.max);
+            
+            // Calculate percentage
+            const pct = x / rect.width;
+            
+            // Set new value
+            pitchSlider.value = min + pct * (max - min);
+            
+            // Manually trigger the pitch update logic since programmatic value change doesn't fire 'input' event
+            handlePitchInputChange();
+        }
 
         pitchSlider.addEventListener('mousedown', handleSliderInteractionStart);
-        pitchSlider.addEventListener('touchstart', handleSliderInteractionStart, { passive: false });
+        
+        // TOUCH START: Jump immediately to finger and start sound
+        pitchSlider.addEventListener('touchstart', (e) => {
+            handleSliderInteractionStart(e);
+            handleTouchUpdate(e);
+        }, { passive: false });
+
+        // TOUCH MOVE: Follow finger
+        pitchSlider.addEventListener('touchmove', (e) => {
+            if(voice.state.isSliderInteractionActive) {
+                handleTouchUpdate(e);
+            }
+        }, { passive: false });
+
 
         document.addEventListener('mouseup', () => { if(voice.state.isSliderInteractionActive) handleSliderInteractionEnd(); });
         document.addEventListener('touchend', () => { if(voice.state.isSliderInteractionActive) handleSliderInteractionEnd(); });

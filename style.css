@@ -103,6 +103,9 @@ input[type="range"] {
     appearance: none;
     background: transparent; /* Make background transparent for custom styling */
     width: 100%; /* Ensure it takes full width of its container */
+    
+    /* CRITICAL FOR MOBILE: Prevents browser scroll/zoom gestures on the slider */
+    touch-action: none; 
 }
 
 /* Custom Track Styles */
